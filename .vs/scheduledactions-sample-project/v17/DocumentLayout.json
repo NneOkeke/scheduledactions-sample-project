@@ -1,7 +1,28 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "D:\\SDK_test\\TestComputeSchedule\\scheduledactions-sample-project\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\SDK_test\\TestComputeSchedule\\scheduledactions-sample-project\\obj\\Debug\\net8.0\\scheduledactions-sample-project.genruntimeconfig.cache||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:obj\\Debug\\net8.0\\scheduledactions-sample-project.genruntimeconfig.cache||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\SDK_test\\TestComputeSchedule\\scheduledactions-sample-project\\bin\\Debug\\net8.0\\scheduledactions-sample-project.deps.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:bin\\Debug\\net8.0\\scheduledactions-sample-project.deps.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\SDK_test\\TestComputeSchedule\\scheduledactions-sample-project\\bin\\Debug\\net8.0\\Azure.Identity.dll||{177559E0-D141-11D0-92DF-00A0C9138C45}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:bin\\Debug\\net8.0\\Azure.Identity.dll||{177559E0-D141-11D0-92DF-00A0C9138C45}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\SDK_test\\TestComputeSchedule\\scheduledactions-sample-project\\bin\\Debug\\net8.0\\Azure.Core.dll||{177559E0-D141-11D0-92DF-00A0C9138C45}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:bin\\Debug\\net8.0\\Azure.Core.dll||{177559E0-D141-11D0-92DF-00A0C9138C45}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{75782567-7A08-4221-9B12-53D95DC9946E}|scheduledactions-sample-project.csproj|d:\\sdk_test\\testcomputeschedule\\scheduledactions-sample-project\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{75782567-7A08-4221-9B12-53D95DC9946E}|scheduledactions-sample-project.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,7 +30,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
@@ -26,6 +47,67 @@
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "scheduledactions-sample-project.genruntimeconfig.cache",
+              "DocumentMoniker": "D:\\SDK_test\\TestComputeSchedule\\scheduledactions-sample-project\\obj\\Debug\\net8.0\\scheduledactions-sample-project.genruntimeconfig.cache",
+              "RelativeDocumentMoniker": "obj\\Debug\\net8.0\\scheduledactions-sample-project.genruntimeconfig.cache",
+              "ToolTip": "D:\\SDK_test\\TestComputeSchedule\\scheduledactions-sample-project\\obj\\Debug\\net8.0\\scheduledactions-sample-project.genruntimeconfig.cache",
+              "RelativeToolTip": "obj\\Debug\\net8.0\\scheduledactions-sample-project.genruntimeconfig.cache",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002368|",
+              "WhenOpened": "2024-01-31T15:51:44.54Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "scheduledactions-sample-project.deps.json",
+              "DocumentMoniker": "D:\\SDK_test\\TestComputeSchedule\\scheduledactions-sample-project\\bin\\Debug\\net8.0\\scheduledactions-sample-project.deps.json",
+              "RelativeDocumentMoniker": "bin\\Debug\\net8.0\\scheduledactions-sample-project.deps.json",
+              "ToolTip": "D:\\SDK_test\\TestComputeSchedule\\scheduledactions-sample-project\\bin\\Debug\\net8.0\\scheduledactions-sample-project.deps.json",
+              "RelativeToolTip": "bin\\Debug\\net8.0\\scheduledactions-sample-project.deps.json",
+              "ViewState": "AQIAADYAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2024-01-31T15:51:16.305Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Azure.Identity.dll",
+              "DocumentMoniker": "D:\\SDK_test\\TestComputeSchedule\\scheduledactions-sample-project\\bin\\Debug\\net8.0\\Azure.Identity.dll",
+              "RelativeDocumentMoniker": "bin\\Debug\\net8.0\\Azure.Identity.dll",
+              "ToolTip": "D:\\SDK_test\\TestComputeSchedule\\scheduledactions-sample-project\\bin\\Debug\\net8.0\\Azure.Identity.dll",
+              "RelativeToolTip": "bin\\Debug\\net8.0\\Azure.Identity.dll",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001697|",
+              "WhenOpened": "2024-01-31T15:51:13.682Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Azure.Core.dll",
+              "DocumentMoniker": "D:\\SDK_test\\TestComputeSchedule\\scheduledactions-sample-project\\bin\\Debug\\net8.0\\Azure.Core.dll",
+              "RelativeDocumentMoniker": "bin\\Debug\\net8.0\\Azure.Core.dll",
+              "ToolTip": "D:\\SDK_test\\TestComputeSchedule\\scheduledactions-sample-project\\bin\\Debug\\net8.0\\Azure.Core.dll",
+              "RelativeToolTip": "bin\\Debug\\net8.0\\Azure.Core.dll",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001697|",
+              "WhenOpened": "2024-01-31T15:51:11.999Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\SDK_test\\TestComputeSchedule\\scheduledactions-sample-project\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "D:\\SDK_test\\TestComputeSchedule\\scheduledactions-sample-project\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AQIAABEAAAAAAAAAAAAMwBkAAABwAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-01-31T15:47:36.708Z",
+              "EditorCaption": ""
             }
           ]
         }

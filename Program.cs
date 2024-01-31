@@ -25,7 +25,7 @@ namespace ComputeScheduleSampleProject
             var getOpsStatusReq = new GetOperationStatusContent(allOperationIds, Guid.NewGuid().ToString());
             var getOperationStatus = TestGetOpsStatusAsync("eastasia", getOpsStatusReq, "afe495ca-b99a-4e36-86c8-9e0e41697f1c").Result;
 
-            Console.WriteLine(getOperationStatus.ToString());
+            // Console.WriteLine(getOperationStatus.ToString());
 
         }
         private static async Task<StartResourceOperationResponse> TestExecuteStartAsync(string location, ExecuteStartContent executeStartRequest, string subid)
@@ -37,8 +37,18 @@ namespace ComputeScheduleSampleProject
             SubscriptionResource subscriptionResource = client.GetSubscriptionResource(subscriptionResourceId);
             string locationparameter = location;
             ExecuteStartContent content = executeStartRequest;
-            StartResourceOperationResponse result = await subscriptionResource.VirtualMachinesExecuteStartScheduledActionAsync(locationparameter, content);
-            Console.WriteLine($"Succeeded: {result}");
+            StartResourceOperationResponse? result;
+            try
+            {
+                result = await subscriptionResource.VirtualMachinesExecuteStartScheduledActionAsync(locationparameter, content);
+                Console.WriteLine($"Succeeded: {result}");
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.InnerException?.Message);
+                throw;
+            }
 
             return result;
         }
@@ -52,10 +62,22 @@ namespace ComputeScheduleSampleProject
             SubscriptionResource subscriptionResource = client.GetSubscriptionResource(subscriptionResourceId);
             string locationparameter = location;
             ExecuteDeallocateContent content = executeDeallocateRequest;
-            DeallocateResourceOperationResponse result = await subscriptionResource.VirtualMachinesExecuteDeallocateScheduledActionAsync(locationparameter, content);
-            Console.WriteLine($"Succeeded: {result}");
+
+            DeallocateResourceOperationResponse? result;
+            try
+            {
+                result = await subscriptionResource.VirtualMachinesExecuteDeallocateScheduledActionAsync(locationparameter, content);
+                Console.WriteLine($"Succeeded: {result}");
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.InnerException?.Message);
+                throw;
+            }
 
             return result;
+
         }
 
         private static async Task<HibernateResourceOperationResponse> TestExecuteHibernateAsync(string location, ExecuteHibernateContent executeHibernateRequest, string subid)
@@ -67,8 +89,19 @@ namespace ComputeScheduleSampleProject
             SubscriptionResource subscriptionResource = client.GetSubscriptionResource(subscriptionResourceId);
             string locationparameter = location;
             ExecuteHibernateContent content = executeHibernateRequest;
-            HibernateResourceOperationResponse result = await subscriptionResource.VirtualMachinesExecuteHibernateScheduledActionAsync(locationparameter, content);
-            Console.WriteLine($"Succeeded: {result}");
+            HibernateResourceOperationResponse? result;
+
+            try
+            {
+                result = await subscriptionResource.VirtualMachinesExecuteHibernateScheduledActionAsync(locationparameter, content);
+                Console.WriteLine($"Succeeded: {result}");
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.InnerException?.Message);
+                throw;
+            }
 
             return result;
         }
@@ -83,8 +116,19 @@ namespace ComputeScheduleSampleProject
             SubscriptionResource subscriptionResource = client.GetSubscriptionResource(subscriptionResourceId);
             string locationparameter = location;
             CancelOperationsContent content = cancelOpsRequest;
-            CancelOperationsResponse result = await subscriptionResource.VirtualMachinesCancelOperationsScheduledActionAsync(locationparameter, content);
-            Console.WriteLine($"Succeeded: {result}");
+            CancelOperationsResponse? result;
+
+            try
+            {
+                result = await subscriptionResource.VirtualMachinesCancelOperationsScheduledActionAsync(locationparameter, content);
+                Console.WriteLine($"Succeeded: {result}");
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.InnerException?.Message);
+                throw;
+            }
 
             return result;
         }
@@ -99,8 +143,19 @@ namespace ComputeScheduleSampleProject
             SubscriptionResource subscriptionResource = client.GetSubscriptionResource(subscriptionResourceId);
             string locationparameter = location;
             GetOperationStatusContent content = getOpsStatusRequest;
-            GetOperationStatusResponse result = await subscriptionResource.VirtualMachinesGetOperationStatusScheduledActionAsync(locationparameter, content);
-            Console.WriteLine($"Succeeded: {result}");
+            GetOperationStatusResponse? result;
+
+            try
+            {
+                result = await subscriptionResource.VirtualMachinesGetOperationStatusScheduledActionAsync(locationparameter, content);
+                Console.WriteLine($"Succeeded: {result}");
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.InnerException?.Message);
+                throw;
+            }
 
             return result;
         }
