@@ -4,6 +4,7 @@ using Azure.ResourceManager;
 using Azure.ResourceManager.ComputeSchedule;
 using Azure.ResourceManager.ComputeSchedule.Models;
 using Azure.ResourceManager.Resources;
+using System.ClientModel.Primitives;
 
 namespace ComputeScheduleSampleProject
 {
@@ -18,15 +19,17 @@ namespace ComputeScheduleSampleProject
             var executeStartRequest = new ExecuteStartContent(new ExecutionParameters(), new Resources(new List<string>() { "/subscriptions/afe495ca-b99a-4e36-86c8-9e0e41697f1c/resourcegroups/Kronox_SyntheticRuns_EastAsia/providers/Microsoft.Compute/virtualMachines/nneka-computeschedule-testvm" }), Guid.NewGuid().ToString());
             var executeStartResult = TestExecuteStartAsync("eastasia", executeStartRequest, "afe495ca-b99a-4e36-86c8-9e0e41697f1c").Result;
 
-            Console.WriteLine(executeStartResult.ToString());
-            Console.WriteLine(BinaryData.FromObjectAsJson(executeStartResult));
+            var executeStartProcessedData = ModelReaderWriter.Write(executeStartResult, ModelReaderWriterOptions.Json);
+            Console.WriteLine(executeStartProcessedData.ToString());
+
 
             // Testing the GetOperationStatus operation
             var allOperationIds = executeStartResult.Results.Select(result => result.Operation?.OperationId).Where(operationId => !string.IsNullOrEmpty(operationId)).ToList();
             var getOpsStatusReq = new GetOperationStatusContent(allOperationIds, Guid.NewGuid().ToString());
             var getOperationStatus = TestGetOpsStatusAsync("eastasia", getOpsStatusReq, "afe495ca-b99a-4e36-86c8-9e0e41697f1c").Result;
 
-            // Console.WriteLine(getOperationStatus.ToString());
+            var getOperationStatusProcessedData = ModelReaderWriter.Write(executeStartResult, ModelReaderWriterOptions.Json);
+            Console.WriteLine(getOperationStatusProcessedData.ToString());
 
         }
         private static async Task<StartResourceOperationResponse> TestExecuteStartAsync(string location, ExecuteStartContent executeStartRequest, string subid)
