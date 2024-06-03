@@ -9,15 +9,16 @@
       "scheduledactions-sample-project/1.0.0": {
         "dependencies": {
           "Azure.Identity": "1.10.4",
-          "Azure.ResourceManager.ComputeSchedule": "1.0.0-alpha.20240119.1"
+          "Azure.ResourceManager.ComputeSchedule": "1.0.0-alpha.20240430.1"
         },
         "runtime": {
           "scheduledactions-sample-project.dll": {}
         }
       },
-      "Azure.Core/1.36.0": {
+      "Azure.Core/1.38.0": {
         "dependencies": {
           "Microsoft.Bcl.AsyncInterfaces": "1.1.1",
+          "System.ClientModel": "1.0.0",
           "System.Diagnostics.DiagnosticSource": "6.0.1",
           "System.Memory.Data": "1.0.2",
           "System.Numerics.Vectors": "4.5.0",
@@ -27,14 +28,14 @@
         },
         "runtime": {
           "lib/net6.0/Azure.Core.dll": {
-            "assemblyVersion": "1.36.0.0",
-            "fileVersion": "1.3600.23.56006"
+            "assemblyVersion": "1.38.0.0",
+            "fileVersion": "1.3800.24.12602"
           }
         }
       },
       "Azure.Identity/1.10.4": {
         "dependencies": {
-          "Azure.Core": "1.36.0",
+          "Azure.Core": "1.38.0",
           "Microsoft.Identity.Client": "4.56.0",
           "Microsoft.Identity.Client.Extensions.Msal": "4.56.0",
           "System.Memory": "4.5.4",
@@ -49,22 +50,23 @@
           }
         }
       },
-      "Azure.ResourceManager/1.9.0": {
+      "Azure.ResourceManager/1.11.0": {
         "dependencies": {
-          "Azure.Core": "1.36.0",
+          "Azure.Core": "1.38.0",
+          "System.ClientModel": "1.0.0",
           "System.Text.Json": "4.7.2"
         },
         "runtime": {
           "lib/netstandard2.0/Azure.ResourceManager.dll": {
-            "assemblyVersion": "1.9.0.0",
-            "fileVersion": "1.900.23.56505"
+            "assemblyVersion": "1.11.0.0",
+            "fileVersion": "1.1100.24.17205"
           }
         }
       },
-      "Azure.ResourceManager.ComputeSchedule/1.0.0-alpha.20240119.1": {
+      "Azure.ResourceManager.ComputeSchedule/1.0.0-alpha.20240430.1": {
         "dependencies": {
-          "Azure.Core": "1.36.0",
-          "Azure.ResourceManager": "1.9.0",
+          "Azure.Core": "1.38.0",
+          "Azure.ResourceManager": "1.11.0",
           "System.ClientModel": "1.0.0",
           "System.Text.Json": "4.7.2"
         },
@@ -188,12 +190,12 @@
       "serviceable": false,
       "sha512": ""
     },
-    "Azure.Core/1.36.0": {
+    "Azure.Core/1.38.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-vwqFZdHS4dzPlI7FFRkPx9ctA+aGGeRev3gnzG8lntWvKMmBhAmulABi1O9CEvS3/jzYt7yA+0pqVdxkpAd7dQ==",
-      "path": "azure.core/1.36.0",
-      "hashPath": "azure.core.1.36.0.nupkg.sha512"
+      "sha512": "sha512-IuEgCoVA0ef7E4pQtpC3+TkPbzaoQfa77HlfJDmfuaJUCVJmn7fT0izamZiryW5sYUFKizsftIxMkXKbgIcPMQ==",
+      "path": "azure.core/1.38.0",
+      "hashPath": "azure.core.1.38.0.nupkg.sha512"
     },
     "Azure.Identity/1.10.4": {
       "type": "package",
@@ -202,19 +204,19 @@
       "path": "azure.identity/1.10.4",
       "hashPath": "azure.identity.1.10.4.nupkg.sha512"
     },
-    "Azure.ResourceManager/1.9.0": {
+    "Azure.ResourceManager/1.11.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-Ki3ethQJOkr0JuKnkazhKP5/bV849x1scwDSS61rrzf2/nmDM56jJmmCARHsFBoZfYQPd4lwCC2SeYfmLOY2wQ==",
-      "path": "azure.resourcemanager/1.9.0",
-      "hashPath": "azure.resourcemanager.1.9.0.nupkg.sha512"
+      "sha512": "sha512-kDgY6jw1LMqQJXO9H+Q6huZiKU1Ctt79wjNDu3etEob/NlOGGCNuQX5tyTm+iOZh17XMFKmTY7c+bT3bYu5uVw==",
+      "path": "azure.resourcemanager/1.11.0",
+      "hashPath": "azure.resourcemanager.1.11.0.nupkg.sha512"
     },
-    "Azure.ResourceManager.ComputeSchedule/1.0.0-alpha.20240119.1": {
+    "Azure.ResourceManager.ComputeSchedule/1.0.0-alpha.20240430.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-88CSINwbbm8iVgeY+KpPCZ2mrm+8FEdMEIRwBCo+N2sPkmxhyd9Zy0N9gR0PRkwsxaRvkcvLO0vvSizqiaDQew==",
-      "path": "azure.resourcemanager.computeschedule/1.0.0-alpha.20240119.1",
-      "hashPath": "azure.resourcemanager.computeschedule.1.0.0-alpha.20240119.1.nupkg.sha512"
+      "sha512": "sha512-eaZBVH5VGXcxD1QZXs40zWWCYy9EJz9L0Q6pgbQVc9dF5nz8hTOITwEVZzaAj7xOcpY8VMWYLbMHZcPC0MERZw==",
+      "path": "azure.resourcemanager.computeschedule/1.0.0-alpha.20240430.1",
+      "hashPath": "azure.resourcemanager.computeschedule.1.0.0-alpha.20240430.1.nupkg.sha512"
     },
     "Microsoft.Bcl.AsyncInterfaces/1.1.1": {
       "type": "package",

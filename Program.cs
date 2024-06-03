@@ -19,6 +19,7 @@ namespace ComputeScheduleSampleProject
             var executeStartResult = TestExecuteStartAsync("eastasia", executeStartRequest, "afe495ca-b99a-4e36-86c8-9e0e41697f1c").Result;
 
             Console.WriteLine(executeStartResult.ToString());
+            Console.WriteLine(BinaryData.FromObjectAsJson(executeStartResult));
 
             // Testing the GetOperationStatus operation
             var allOperationIds = executeStartResult.Results.Select(result => result.Operation?.OperationId).Where(operationId => !string.IsNullOrEmpty(operationId)).ToList();
