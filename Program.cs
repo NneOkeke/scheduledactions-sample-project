@@ -28,7 +28,7 @@ namespace ComputeScheduleSampleProject
             var getOpsStatusReq = new GetOperationStatusContent(allOperationIds, Guid.NewGuid().ToString());
             var getOperationStatus = TestGetOpsStatusAsync("eastasia", getOpsStatusReq, "afe495ca-b99a-4e36-86c8-9e0e41697f1c").Result;
 
-            var getOperationStatusProcessedData = ModelReaderWriter.Write(executeStartResult, ModelReaderWriterOptions.Json);
+            var getOperationStatusProcessedData = ModelReaderWriter.Write(getOperationStatus, ModelReaderWriterOptions.Json);
             Console.WriteLine(getOperationStatusProcessedData.ToString());
 
         }
