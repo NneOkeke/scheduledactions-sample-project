@@ -1,0 +1,15 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/ProjectEvaluation/scheduledactions-sample-project.metadata.v9.bin
+/.vs/ProjectEvaluation/scheduledactions-sample-project.projects.v9.bin
+/.vs/ProjectEvaluation/scheduledactions-sample-project.strings.v9.bin
+/.vs/scheduledactions-sample-project/CopilotIndices/0.2.1627.58842/CodeChunks.db
+/.vs/scheduledactions-sample-project/CopilotIndices/0.2.1627.58842/CodeChunks.db-wal
+*.db
+*.db-shm
+*.db-wal
+/.vs/scheduledactions-sample-project/FileContentIndex/671d06c6-2b33-4557-bf33-9ef8b928aeb5.vsidx
+*.vsidx
+/.vs/scheduledactions-sample-project/v17/DocumentLayout.backup.json
