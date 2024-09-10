@@ -986,23 +986,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\nnekaokeke\\.nuget\\packages\\": {},
+    "C:\\.tools\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\SDK_test\\TestComputeSchedule\\scheduledactions-sample-project\\scheduledactions-sample-project.csproj",
+      "projectUniqueName": "C:\\Users\\nnekaokeke\\Desktop\\Work\\SDK\\TestComputeSchedule\\scheduledactions-sample-project\\scheduledactions-sample-project.csproj",
       "projectName": "scheduledactions-sample-project",
-      "projectPath": "D:\\SDK_test\\TestComputeSchedule\\scheduledactions-sample-project\\scheduledactions-sample-project.csproj",
-      "packagesPath": "C:\\Users\\nnekaokeke\\.nuget\\packages\\",
-      "outputPath": "D:\\SDK_test\\TestComputeSchedule\\scheduledactions-sample-project\\obj\\",
+      "projectPath": "C:\\Users\\nnekaokeke\\Desktop\\Work\\SDK\\TestComputeSchedule\\scheduledactions-sample-project\\scheduledactions-sample-project.csproj",
+      "packagesPath": "C:\\.tools\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\nnekaokeke\\Desktop\\Work\\SDK\\TestComputeSchedule\\scheduledactions-sample-project\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "D:\\SDK_test\\TestComputeSchedule\\scheduledactions-sample-project\\NuGet.Config",
+        "C:\\Users\\nnekaokeke\\Desktop\\Work\\SDK\\TestComputeSchedule\\scheduledactions-sample-project\\NuGet.Config",
         "C:\\Users\\nnekaokeke\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
@@ -1024,6 +1024,11 @@
         "warnAsError": [
           "NU1605"
         ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
       }
     },
     "frameworks": {
@@ -1055,7 +1060,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.101/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
