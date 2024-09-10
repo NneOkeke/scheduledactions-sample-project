@@ -15,9 +15,21 @@ namespace ComputeScheduleSampleProject
         /// </summary>
         private static void Main(string[] args)
         {
+            // Enter the location of the virtual machines to be operated on
+            var location = "LOCATION OF VIRTUAL MACHINE HERE";
+
+            // Enter the subscription associated with the virtual machines to be operated on
+            var subscriptionId = "SUBSCRIPTION GUID HERE";
+
+            // Enter the fuly qualified ARM ID of the virtual machines to be operated on
+            var armId = new List<string>()
+            {
+                "ARMIDS OF RESOURCES HERE"
+            };
+
             // Testing the ExecuteStart operation
-            var executeStartRequest = new ExecuteStartContent(new ExecutionParameters(), new Resources(["/subscriptions/afe495ca-b99a-4e36-86c8-9e0e41697f1c/resourcegroups/Kronox_SyntheticRuns_EastAsia/providers/Microsoft.Compute/virtualMachines/nneka-computeschedule-testvm"]), Guid.NewGuid().ToString());
-            var executeStartResult = TestExecuteStartAsync("eastasia", executeStartRequest, "afe495ca-b99a-4e36-86c8-9e0e41697f1c").Result;
+            var executeStartRequest = new ExecuteStartContent(new ExecutionParameters(), new Resources(armId), Guid.NewGuid().ToString());
+            var executeStartResult = TestExecuteStartAsync(location, executeStartRequest, subscriptionId).Result;
 
             var executeStartProcessedData = ModelReaderWriter.Write(executeStartResult, ModelReaderWriterOptions.Json);
             Console.WriteLine(executeStartProcessedData.ToString());
@@ -26,11 +38,10 @@ namespace ComputeScheduleSampleProject
             // Testing the GetOperationStatus operation
             var allOperationIds = executeStartResult.Results.Select(result => result.Operation?.OperationId).Where(operationId => !string.IsNullOrEmpty(operationId)).ToList();
             var getOpsStatusReq = new GetOperationStatusContent(allOperationIds, Guid.NewGuid().ToString());
-            var getOperationStatus = TestGetOpsStatusAsync("eastasia", getOpsStatusReq, "afe495ca-b99a-4e36-86c8-9e0e41697f1c").Result;
+            var getOperationStatus = TestGetOpsStatusAsync(location, getOpsStatusReq, subscriptionId).Result;
 
             var getOperationStatusProcessedData = ModelReaderWriter.Write(getOperationStatus, ModelReaderWriterOptions.Json);
             Console.WriteLine(getOperationStatusProcessedData.ToString());
-
         }
         private static async Task<StartResourceOperationResponse> TestExecuteStartAsync(string location, ExecuteStartContent executeStartRequest, string subid)
         {
@@ -98,6 +109,81 @@ namespace ComputeScheduleSampleProject
             try
             {
                 result = await subscriptionResource.VirtualMachinesExecuteHibernateScheduledActionAsync(locationparameter, content);
+                Console.WriteLine($"Succeeded: {result}");
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.InnerException?.Message);
+                throw;
+            }
+
+            return result;
+        }
+
+        private static async Task<StartResourceOperationResponse> TestSubmitStartAsync(string location, SubmitStartContent submitStartRequest, string subid)
+        {
+            TokenCredential cred = new DefaultAzureCredential();
+            ArmClient client = new(cred);
+            string subscriptionId = subid;
+            ResourceIdentifier subscriptionResourceId = SubscriptionResource.CreateResourceIdentifier(subscriptionId);
+            SubscriptionResource subscriptionResource = client.GetSubscriptionResource(subscriptionResourceId);
+            string locationparameter = location;
+            SubmitStartContent content = submitStartRequest;
+            StartResourceOperationResponse? result;
+            try
+            {
+                result = await subscriptionResource.VirtualMachinesSubmitStartScheduledActionAsync(locationparameter, content);
+                Console.WriteLine($"Succeeded: {result}");
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.InnerException?.Message);
+                throw;
+            }
+
+            return result;
+        }
+
+        private static async Task<DeallocateResourceOperationResponse> TestSubmitDeallocateAsync(string location, SubmitDeallocateContent submitDeallocateRequest, string subid)
+        {
+            TokenCredential cred = new DefaultAzureCredential();
+            ArmClient client = new(cred);
+            string subscriptionId = subid;
+            ResourceIdentifier subscriptionResourceId = SubscriptionResource.CreateResourceIdentifier(subscriptionId);
+            SubscriptionResource subscriptionResource = client.GetSubscriptionResource(subscriptionResourceId);
+            string locationparameter = location;
+            SubmitDeallocateContent content = submitDeallocateRequest;
+            DeallocateResourceOperationResponse? result;
+            try
+            {
+                result = await subscriptionResource.VirtualMachinesSubmitDeallocateScheduledActionAsync(locationparameter, content);
+                Console.WriteLine($"Succeeded: {result}");
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.InnerException?.Message);
+                throw;
+            }
+
+            return result;
+        }
+
+        private static async Task<HibernateResourceOperationResponse> TestSubmitHibernateAsync(string location, SubmitHibernateContent submitHibernateRequest, string subid)
+        {
+            TokenCredential cred = new DefaultAzureCredential();
+            ArmClient client = new(cred);
+            string subscriptionId = subid;
+            ResourceIdentifier subscriptionResourceId = SubscriptionResource.CreateResourceIdentifier(subscriptionId);
+            SubscriptionResource subscriptionResource = client.GetSubscriptionResource(subscriptionResourceId);
+            string locationparameter = location;
+            SubmitHibernateContent content = submitHibernateRequest;
+            HibernateResourceOperationResponse? result;
+            try
+            {
+                result = await subscriptionResource.VirtualMachinesSubmitHibernateScheduledActionAsync(locationparameter, content);
                 Console.WriteLine($"Succeeded: {result}");
 
             }

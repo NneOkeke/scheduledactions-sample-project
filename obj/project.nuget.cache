@@ -1,13 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "P1WZpozXFfE=",
+  "dgSpecHash": "SaIu1pVcEjI=",
   "success": true,
-  "projectFilePath": "C:\\Users\\nnekaokeke\\Desktop\\Work\\SDK\\TestComputeSchedule\\scheduledactions-sample-project\\scheduledactions-sample-project.csproj",
+  "projectFilePath": "C:\\Users\\nnekaokeke\\Desktop\\Work\\SDK\\TestComputeSchedule\\scheduledactions-sample-project_LOCALSDK\\scheduledactions-sample-project.csproj",
   "expectedPackageFiles": [
-    "C:\\.tools\\.nuget\\packages\\azure.core\\1.36.0\\azure.core.1.36.0.nupkg.sha512",
+    "C:\\.tools\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\.tools\\.nuget\\packages\\azure.identity\\1.10.4\\azure.identity.1.10.4.nupkg.sha512",
-    "C:\\.tools\\.nuget\\packages\\azure.resourcemanager\\1.9.0\\azure.resourcemanager.1.9.0.nupkg.sha512",
-    "C:\\.tools\\.nuget\\packages\\azure.resourcemanager.computeschedule\\1.0.0-alpha.20240119.1\\azure.resourcemanager.computeschedule.1.0.0-alpha.20240119.1.nupkg.sha512",
+    "C:\\.tools\\.nuget\\packages\\azure.resourcemanager\\1.11.0\\azure.resourcemanager.1.11.0.nupkg.sha512",
+    "C:\\.tools\\.nuget\\packages\\azure.resourcemanager.computeschedule\\1.0.0-alpha.20240430.1\\azure.resourcemanager.computeschedule.1.0.0-alpha.20240430.1.nupkg.sha512",
     "C:\\.tools\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\1.1.1\\microsoft.bcl.asyncinterfaces.1.1.1.nupkg.sha512",
     "C:\\.tools\\.nuget\\packages\\microsoft.identity.client\\4.56.0\\microsoft.identity.client.4.56.0.nupkg.sha512",
     "C:\\.tools\\.nuget\\packages\\microsoft.identity.client.extensions.msal\\4.56.0\\microsoft.identity.client.extensions.msal.4.56.0.nupkg.sha512",
