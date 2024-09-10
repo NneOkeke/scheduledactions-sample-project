@@ -2,11 +2,10 @@
   "version": 3,
   "targets": {
     "net8.0": {
-      "Azure.Core/1.38.0": {
+      "Azure.Core/1.36.0": {
         "type": "package",
         "dependencies": {
           "Microsoft.Bcl.AsyncInterfaces": "1.1.1",
-          "System.ClientModel": "1.0.0",
           "System.Diagnostics.DiagnosticSource": "6.0.1",
           "System.Memory.Data": "1.0.2",
           "System.Numerics.Vectors": "4.5.0",
@@ -43,43 +42,6 @@
         },
         "runtime": {
           "lib/netstandard2.0/Azure.Identity.dll": {
-            "related": ".xml"
-          }
-        }
-      },
-      "Azure.ResourceManager/1.11.0": {
-        "type": "package",
-        "dependencies": {
-          "Azure.Core": "1.38.0",
-          "System.ClientModel": "1.0.0",
-          "System.Text.Json": "4.7.2"
-        },
-        "compile": {
-          "lib/netstandard2.0/Azure.ResourceManager.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/netstandard2.0/Azure.ResourceManager.dll": {
-            "related": ".xml"
-          }
-        }
-      },
-      "Azure.ResourceManager.ComputeSchedule/1.0.0-alpha.20240430.1": {
-        "type": "package",
-        "dependencies": {
-          "Azure.Core": "1.38.0",
-          "Azure.ResourceManager": "1.11.0",
-          "System.ClientModel": "1.0.0",
-          "System.Text.Json": "4.7.2"
-        },
-        "compile": {
-          "lib/netstandard2.0/Azure.ResourceManager.ComputeSchedule.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/netstandard2.0/Azure.ResourceManager.ComputeSchedule.dll": {
             "related": ".xml"
           }
         }
@@ -149,23 +111,6 @@
         },
         "runtime": {
           "lib/netstandard1.0/_._": {}
-        }
-      },
-      "System.ClientModel/1.0.0": {
-        "type": "package",
-        "dependencies": {
-          "System.Memory.Data": "1.0.2",
-          "System.Text.Json": "4.7.2"
-        },
-        "compile": {
-          "lib/net6.0/System.ClientModel.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net6.0/System.ClientModel.dll": {
-            "related": ".xml"
-          }
         }
       },
       "System.Diagnostics.DiagnosticSource/6.0.1": {
@@ -364,24 +309,28 @@
     }
   },
   "libraries": {
-    "Azure.Core/1.38.0": {
-      "sha512": "IuEgCoVA0ef7E4pQtpC3+TkPbzaoQfa77HlfJDmfuaJUCVJmn7fT0izamZiryW5sYUFKizsftIxMkXKbgIcPMQ==",
+    "Azure.Core/1.36.0": {
+      "sha512": "vwqFZdHS4dzPlI7FFRkPx9ctA+aGGeRev3gnzG8lntWvKMmBhAmulABi1O9CEvS3/jzYt7yA+0pqVdxkpAd7dQ==",
       "type": "package",
-      "path": "azure.core/1.38.0",
+      "path": "azure.core/1.36.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "CHANGELOG.md",
         "README.md",
-        "azure.core.1.38.0.nupkg.sha512",
+        "azure.core.1.36.0.nupkg.sha512",
         "azure.core.nuspec",
         "azureicon.png",
         "lib/net461/Azure.Core.dll",
         "lib/net461/Azure.Core.xml",
         "lib/net472/Azure.Core.dll",
         "lib/net472/Azure.Core.xml",
+        "lib/net5.0/Azure.Core.dll",
+        "lib/net5.0/Azure.Core.xml",
         "lib/net6.0/Azure.Core.dll",
         "lib/net6.0/Azure.Core.xml",
+        "lib/netcoreapp2.1/Azure.Core.dll",
+        "lib/netcoreapp2.1/Azure.Core.xml",
         "lib/netstandard2.0/Azure.Core.dll",
         "lib/netstandard2.0/Azure.Core.xml"
       ]
@@ -400,37 +349,6 @@
         "azureicon.png",
         "lib/netstandard2.0/Azure.Identity.dll",
         "lib/netstandard2.0/Azure.Identity.xml"
-      ]
-    },
-    "Azure.ResourceManager/1.11.0": {
-      "sha512": "kDgY6jw1LMqQJXO9H+Q6huZiKU1Ctt79wjNDu3etEob/NlOGGCNuQX5tyTm+iOZh17XMFKmTY7c+bT3bYu5uVw==",
-      "type": "package",
-      "path": "azure.resourcemanager/1.11.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "CHANGELOG.md",
-        "README.md",
-        "azure.resourcemanager.1.11.0.nupkg.sha512",
-        "azure.resourcemanager.nuspec",
-        "azureicon.png",
-        "lib/netstandard2.0/Azure.ResourceManager.dll",
-        "lib/netstandard2.0/Azure.ResourceManager.xml"
-      ]
-    },
-    "Azure.ResourceManager.ComputeSchedule/1.0.0-alpha.20240430.1": {
-      "sha512": "eaZBVH5VGXcxD1QZXs40zWWCYy9EJz9L0Q6pgbQVc9dF5nz8hTOITwEVZzaAj7xOcpY8VMWYLbMHZcPC0MERZw==",
-      "type": "package",
-      "path": "azure.resourcemanager.computeschedule/1.0.0-alpha.20240430.1",
-      "files": [
-        ".nupkg.metadata",
-        "CHANGELOG.md",
-        "README.md",
-        "azure.resourcemanager.computeschedule.1.0.0-alpha.20240430.1.nupkg.sha512",
-        "azure.resourcemanager.computeschedule.nuspec",
-        "azureicon.png",
-        "lib/netstandard2.0/Azure.ResourceManager.ComputeSchedule.dll",
-        "lib/netstandard2.0/Azure.ResourceManager.ComputeSchedule.xml"
       ]
     },
     "Microsoft.Bcl.AsyncInterfaces/1.1.1": {
@@ -544,24 +462,6 @@
         "runtime.json",
         "useSharedDesignerContext.txt",
         "version.txt"
-      ]
-    },
-    "System.ClientModel/1.0.0": {
-      "sha512": "I3CVkvxeqFYjIVEP59DnjbeoGNfo/+SZrCLpRz2v/g0gpCHaEMPtWSY0s9k/7jR1rAsLNg2z2u1JRB76tPjnIw==",
-      "type": "package",
-      "path": "system.clientmodel/1.0.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "CHANGELOG.md",
-        "DotNetPackageIcon.png",
-        "README.md",
-        "lib/net6.0/System.ClientModel.dll",
-        "lib/net6.0/System.ClientModel.xml",
-        "lib/netstandard2.0/System.ClientModel.dll",
-        "lib/netstandard2.0/System.ClientModel.xml",
-        "system.clientmodel.1.0.0.nupkg.sha512",
-        "system.clientmodel.nuspec"
       ]
     },
     "System.Diagnostics.DiagnosticSource/6.0.1": {
@@ -979,8 +879,7 @@
   },
   "projectFileDependencyGroups": {
     "net8.0": [
-      "Azure.Identity >= 1.10.4",
-      "Azure.ResourceManager.ComputeSchedule >= 1.0.0-alpha.20240430.1"
+      "Azure.Identity >= 1.10.4"
     ]
   },
   "packageFolders": {
@@ -1037,10 +936,6 @@
           "Azure.Identity": {
             "target": "Package",
             "version": "[1.10.4, )"
-          },
-          "Azure.ResourceManager.ComputeSchedule": {
-            "target": "Package",
-            "version": "[1.0.0-alpha.20240430.1, )"
           }
         },
         "imports": [

@@ -54,10 +54,6 @@
             "Azure.Identity": {
               "target": "Package",
               "version": "[1.10.4, )"
-            },
-            "Azure.ResourceManager.ComputeSchedule": {
-              "target": "Package",
-              "version": "[1.0.0-alpha.20240430.1, )"
             }
           },
           "imports": [
