@@ -883,23 +883,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\.tools\\.nuget\\packages\\": {},
+    "C:\\Users\\nnekaokeke\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\nnekaokeke\\Desktop\\Work\\SDK\\TestComputeSchedule\\scheduledactions-sample-project_LOCALSDK\\scheduledactions-sample-project.csproj",
+      "projectUniqueName": "C:\\Users\\nnekaokeke\\Desktop\\TestLocalSdk\\New folder\\scheduledactions-sample-project\\scheduledactions-sample-project.csproj",
       "projectName": "scheduledactions-sample-project",
-      "projectPath": "C:\\Users\\nnekaokeke\\Desktop\\Work\\SDK\\TestComputeSchedule\\scheduledactions-sample-project_LOCALSDK\\scheduledactions-sample-project.csproj",
-      "packagesPath": "C:\\.tools\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\nnekaokeke\\Desktop\\Work\\SDK\\TestComputeSchedule\\scheduledactions-sample-project_LOCALSDK\\obj\\",
+      "projectPath": "C:\\Users\\nnekaokeke\\Desktop\\TestLocalSdk\\New folder\\scheduledactions-sample-project\\scheduledactions-sample-project.csproj",
+      "packagesPath": "C:\\Users\\nnekaokeke\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\nnekaokeke\\Desktop\\TestLocalSdk\\New folder\\scheduledactions-sample-project\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\nnekaokeke\\Desktop\\Work\\SDK\\TestComputeSchedule\\scheduledactions-sample-project_LOCALSDK\\NuGet.Config",
+        "C:\\Users\\nnekaokeke\\Desktop\\TestLocalSdk\\New folder\\scheduledactions-sample-project\\NuGet.Config",
         "C:\\Users\\nnekaokeke\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
@@ -926,8 +926,9 @@
       "restoreAuditProperties": {
         "enableAudit": "true",
         "auditLevel": "low",
-        "auditMode": "direct"
-      }
+        "auditMode": "all"
+      },
+      "SdkAnalysisLevel": "9.0.100"
     },
     "frameworks": {
       "net8.0": {
@@ -954,7 +955,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.100-preview.7.24407.12/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
