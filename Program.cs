@@ -22,9 +22,9 @@ namespace ComputeScheduleSampleProject
             var subscriptionId = "SUBSCRIPTION GUID HERE";
 
             // Enter the fuly qualified ARM ID of the virtual machines to be operated on
-            var armId = new List<string>()
+            var armId = new List<ResourceIdentifier>()
             {
-                "ARMIDS OF RESOURCES HERE"
+                new ResourceIdentifier("ARM ID OF VIRTUAL MACHINE HERE")
             };
 
             // Testing the ExecuteStart operation
