@@ -24,7 +24,7 @@ namespace ComputeScheduleSampleProject
             // Enter the fuly qualified ARM ID of the virtual machines to be operated on
             var armId = new List<ResourceIdentifier>()
             {
-                new ResourceIdentifier("ARM ID OF VIRTUAL MACHINE HERE")
+                "ARM ID OF VIRTUAL MACHINE HERE"
             };
 
             // Testing the ExecuteStart operation
