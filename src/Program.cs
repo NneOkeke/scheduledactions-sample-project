@@ -17,7 +17,7 @@ namespace ComputeScheduleSampleProject
         private static void Main(string[] args)
         {
             // Testing the ExecuteStart operation
-            var executeStartRequest = new ExecuteStartContent(new ExecutionParameters(), new Resources(new List<string>() { "/subscriptions/afe495ca-b99a-4e36-86c8-9e0e41697f1c/resourcegroups/Kronox_SyntheticRuns_EastAsia/providers/Microsoft.Compute/virtualMachines/nneka-computeschedule-testvm" }), Guid.NewGuid().ToString());
+            var executeStartRequest = new ExecuteStartContent(new ScheduledActionExecutionParameterDetail(), new UserRequestResources(new List<ResourceIdentifier>() { new("/subscriptions/afe495ca-b99a-4e36-86c8-9e0e41697f1c/resourcegroups/Kronox_SyntheticRuns_EastAsia/providers/Microsoft.Compute/virtualMachines/nneka-computeschedule-testvm") }), Guid.NewGuid().ToString());
             var executeStartResult = TestExecuteStartAsync("eastasia", executeStartRequest, "afe495ca-b99a-4e36-86c8-9e0e41697f1c").Result;
 
             var executeStartProcessedData = ModelReaderWriter.Write(executeStartResult, ModelReaderWriterOptions.Json);
@@ -33,7 +33,7 @@ namespace ComputeScheduleSampleProject
             Console.WriteLine(getOperationStatusProcessedData.ToString());
 
         }
-        private static async Task<StartResourceOperationResponse> TestExecuteStartAsync(string location, ExecuteStartContent executeStartRequest, string subid)
+        private static async Task<StartResourceOperationResult> TestExecuteStartAsync(string location, ExecuteStartContent executeStartRequest, string subid)
         {
             TokenCredential cred = new DefaultAzureCredential();
             ArmClient client = new(cred);
@@ -42,10 +42,10 @@ namespace ComputeScheduleSampleProject
             SubscriptionResource subscriptionResource = client.GetSubscriptionResource(subscriptionResourceId);
             string locationparameter = location;
             ExecuteStartContent content = executeStartRequest;
-            StartResourceOperationResponse? result;
+            StartResourceOperationResult? result;
             try
             {
-                result = await subscriptionResource.VirtualMachinesExecuteStartScheduledActionAsync(locationparameter, content);
+                result = await subscriptionResource.ExecuteVirtualMachineStartAsync(locationparameter, content);
                 Console.WriteLine($"Succeeded: {result}");
 
             }
@@ -58,7 +58,7 @@ namespace ComputeScheduleSampleProject
             return result;
         }
 
-        private static async Task<DeallocateResourceOperationResponse> TestExecuteDeallocateAsync(string location, ExecuteDeallocateContent executeDeallocateRequest, string subid)
+        private static async Task<DeallocateResourceOperationResult> TestExecuteDeallocateAsync(string location, ExecuteDeallocateContent executeDeallocateRequest, string subid)
         {
             TokenCredential cred = new DefaultAzureCredential();
             ArmClient client = new(cred);
@@ -68,10 +68,10 @@ namespace ComputeScheduleSampleProject
             string locationparameter = location;
             ExecuteDeallocateContent content = executeDeallocateRequest;
 
-            DeallocateResourceOperationResponse? result;
+            DeallocateResourceOperationResult? result;
             try
             {
-                result = await subscriptionResource.VirtualMachinesExecuteDeallocateScheduledActionAsync(locationparameter, content);
+                result = await subscriptionResource.ExecuteVirtualMachineDeallocateAsync(locationparameter, content);
                 Console.WriteLine($"Succeeded: {result}");
 
             }
@@ -85,7 +85,7 @@ namespace ComputeScheduleSampleProject
 
         }
 
-        private static async Task<HibernateResourceOperationResponse> TestExecuteHibernateAsync(string location, ExecuteHibernateContent executeHibernateRequest, string subid)
+        private static async Task<HibernateResourceOperationResult> TestExecuteHibernateAsync(string location, ExecuteHibernateContent executeHibernateRequest, string subid)
         {
             TokenCredential cred = new DefaultAzureCredential();
             ArmClient client = new(cred);
@@ -94,11 +94,11 @@ namespace ComputeScheduleSampleProject
             SubscriptionResource subscriptionResource = client.GetSubscriptionResource(subscriptionResourceId);
             string locationparameter = location;
             ExecuteHibernateContent content = executeHibernateRequest;
-            HibernateResourceOperationResponse? result;
+            HibernateResourceOperationResult? result;
 
             try
             {
-                result = await subscriptionResource.VirtualMachinesExecuteHibernateScheduledActionAsync(locationparameter, content);
+                result = await subscriptionResource.ExecuteVirtualMachineHibernateAsync(locationparameter, content);
                 Console.WriteLine($"Succeeded: {result}");
 
             }
@@ -111,7 +111,7 @@ namespace ComputeScheduleSampleProject
             return result;
         }
 
-        public static async Task<CancelOperationsResponse> TestCancelOpsAsync(string location, CancelOperationsContent cancelOpsRequest, string subid)
+        public static async Task<CancelOperationsResult> TestCancelOpsAsync(string location, CancelOperationsContent cancelOpsRequest, string subid)
         {
             TokenCredential cred = new DefaultAzureCredential();
 
@@ -121,11 +121,11 @@ namespace ComputeScheduleSampleProject
             SubscriptionResource subscriptionResource = client.GetSubscriptionResource(subscriptionResourceId);
             string locationparameter = location;
             CancelOperationsContent content = cancelOpsRequest;
-            CancelOperationsResponse? result;
+            CancelOperationsResult? result;
 
             try
             {
-                result = await subscriptionResource.VirtualMachinesCancelOperationsScheduledActionAsync(locationparameter, content);
+                result = await subscriptionResource.CancelVirtualMachineOperationsAsync(locationparameter, content);
                 Console.WriteLine($"Succeeded: {result}");
 
             }
@@ -138,7 +138,7 @@ namespace ComputeScheduleSampleProject
             return result;
         }
 
-        public static async Task<GetOperationStatusResponse> TestGetOpsStatusAsync(string location, GetOperationStatusContent getOpsStatusRequest, string subid)
+        public static async Task<GetOperationStatusResult> TestGetOpsStatusAsync(string location, GetOperationStatusContent getOpsStatusRequest, string subid)
         {
             TokenCredential cred = new DefaultAzureCredential();
 
@@ -148,11 +148,38 @@ namespace ComputeScheduleSampleProject
             SubscriptionResource subscriptionResource = client.GetSubscriptionResource(subscriptionResourceId);
             string locationparameter = location;
             GetOperationStatusContent content = getOpsStatusRequest;
-            GetOperationStatusResponse? result;
+            GetOperationStatusResult? result;
 
             try
             {
-                result = await subscriptionResource.VirtualMachinesGetOperationStatusScheduledActionAsync(locationparameter, content);
+                result = await subscriptionResource.GetVirtualMachineOperationStatusAsync(locationparameter, content);
+                Console.WriteLine($"Succeeded: {result}");
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.InnerException?.Message);
+                throw;
+            }
+
+            return result;
+        }
+
+        public static async Task<GetOperationErrorsResult> TestGetOpsErrorsAsync(string location, GetOperationErrorsContent getOpsErrorsRequest, string subid)
+        {
+            TokenCredential cred = new DefaultAzureCredential();
+
+            ArmClient client = new(cred);
+            string subscriptionId = subid;
+            ResourceIdentifier subscriptionResourceId = SubscriptionResource.CreateResourceIdentifier(subscriptionId);
+            SubscriptionResource subscriptionResource = client.GetSubscriptionResource(subscriptionResourceId);
+            string locationparameter = location;
+            GetOperationErrorsContent content = getOpsErrorsRequest;
+            GetOperationErrorsResult? result;
+
+            try
+            {
+                result = await subscriptionResource.GetVirtualMachineOperationErrorsAsync(locationparameter, content);
                 Console.WriteLine($"Succeeded: {result}");
 
             }
