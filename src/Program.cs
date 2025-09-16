@@ -1,195 +1,133 @@
+using Azure;
 using Azure.Core;
 using Azure.Identity;
 using Azure.ResourceManager;
 using Azure.ResourceManager.ComputeSchedule;
 using Azure.ResourceManager.ComputeSchedule.Models;
 using Azure.ResourceManager.Resources;
-using System.ClientModel.Primitives;
-using System.Resources;
 
 namespace ComputeScheduleSampleProject
 {
-    internal static class Program
+    public static class Program
     {
         /// <summary>
-        /// This project shows a sample use case for the ComputeSchedule use case
+        /// This project shows a sample use case for the ComputeSchedule SDK
         /// </summary>
-        private static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            // Testing the ExecuteStart operation
-            var executeStartRequest = new ExecuteStartContent(new ScheduledActionExecutionParameterDetail(), new UserRequestResources(new List<ResourceIdentifier>() { new("/subscriptions/afe495ca-b99a-4e36-86c8-9e0e41697f1c/resourcegroups/Kronox_SyntheticRuns_EastAsia/providers/Microsoft.Compute/virtualMachines/nneka-computeschedule-testvm") }), Guid.NewGuid().ToString());
-            var executeStartResult = TestExecuteStartAsync("eastasia", executeStartRequest, "afe495ca-b99a-4e36-86c8-9e0e41697f1c").Result;
+            var blockedOperationsException = new HashSet<string> { "SchedulingOperationsBlockedException", "NonSchedulingOperationsBlockedException" };
 
-            var executeStartProcessedData = ModelReaderWriter.Write(executeStartResult, ModelReaderWriterOptions.Json);
-            Console.WriteLine(executeStartProcessedData.ToString());
+            // Location: The location of the virtual machines
+            const string location = "eastasia";
 
+            // SubscriptionId: The subscription id under which the virtual machines are located, in this case, we are using a dummy subscriptionId
+            const string subscriptionId = "d93f78f2-e878-40c2-9d5d-dcfdbb8042a0";
 
-            // Testing the GetOperationStatus operation
-            var allOperationIds = executeStartResult.Results.Select(result => result.Operation?.OperationId).Where(operationId => !string.IsNullOrEmpty(operationId)).ToList();
-            var getOpsStatusReq = new GetOperationStatusContent(allOperationIds, Guid.NewGuid().ToString());
-            var getOperationStatus = TestGetOpsStatusAsync("eastasia", getOpsStatusReq, "afe495ca-b99a-4e36-86c8-9e0e41697f1c").Result;
-
-            var getOperationStatusProcessedData = ModelReaderWriter.Write(getOperationStatus, ModelReaderWriterOptions.Json);
-            Console.WriteLine(getOperationStatusProcessedData.ToString());
-
-        }
-        private static async Task<StartResourceOperationResult> TestExecuteStartAsync(string location, ExecuteStartContent executeStartRequest, string subid)
-        {
+            Dictionary<string, ResourceOperationDetails> completedOperations = [];
+            // Credential: The Azure credential used to authenticate the request
             TokenCredential cred = new DefaultAzureCredential();
+
+            // Client: The Azure Resource Manager client used to interact with the Azure Resource Manager API
             ArmClient client = new(cred);
-            string subscriptionId = subid;
-            ResourceIdentifier subscriptionResourceId = SubscriptionResource.CreateResourceIdentifier(subscriptionId);
-            SubscriptionResource subscriptionResource = client.GetSubscriptionResource(subscriptionResourceId);
-            string locationparameter = location;
-            ExecuteStartContent content = executeStartRequest;
-            StartResourceOperationResult? result;
+            var subscriptionResource = UtilityMethods.GetSubscriptionResource(client, subscriptionId);
+
+            // Execution parameters for the request including the retry policy used by Scheduledactions to retry the operation in case of failures
+            var executionParams = new ScheduledActionExecutionParameterDetail()
+            {
+                RetryPolicy = new UserRequestRetryPolicy()
+                {
+                    // Number of times ScheduledActions should retry the operation in case of failures: Range 0-7
+                    RetryCount = 3,
+                    // Time window in minutes within which ScheduledActions should retry the operation in case of failures: Range in minutes 5-120
+                    RetryWindowInMinutes = 45
+                }
+            };
+
+            // List of virtual machine resource identifiers to perform execute/submit type operations on, in this case, we are using dummy VMs. Virtual Machines must all be under the same subscriptionid
+            var resourceIds = new List<ResourceIdentifier>()
+            {
+                new($"/subscriptions/{subscriptionId}/resourceGroups/ScheduledActions_Baseline_EastAsia/providers/Microsoft.Compute/virtualMachines/dummy-vm-600"),
+                new($"/subscriptions/{subscriptionId}/resourceGroups/ScheduledActions_Baseline_EastAsia/providers/Microsoft.Compute/virtualMachines/dummy-vm-611"),
+                new($"/subscriptions/{subscriptionId}/resourceGroups/ScheduledActions_Baseline_EastAsia/providers/Microsoft.Compute/virtualMachines/dummy-vm-612"),
+            };
+
+            // Execute type operation: Start operation on virtual machines
+            await ScheduledActions_ExecuteStartOperation(
+                completedOperations,
+                executionParams,
+                subscriptionResource,
+                subscriptionId,
+                blockedOperationsException,
+                location,
+                resourceIds);
+        }
+
+        /// <summary>
+        /// This method details the happy path for executing an execute type operation in ScheduledActions
+        /// </summary>
+        /// <param name="completedOperations"></param>
+        /// <param name="retryPolicy"></param>
+        /// <param name="subscriptionResource"></param>
+        /// <param name="subscriptionId"></param>
+        /// <returns></returns>
+        private static async Task ScheduledActions_ExecuteStartOperation(Dictionary<string, ResourceOperationDetails> completedOperations, ScheduledActionExecutionParameterDetail retryPolicy, SubscriptionResource subscriptionResource, string subscriptionId, HashSet<string> blockedOperationsException, string location, List<ResourceIdentifier> resourceIds)
+        {
             try
             {
-                result = await subscriptionResource.ExecuteVirtualMachineStartAsync(locationparameter, content);
-                Console.WriteLine($"Succeeded: {result}");
+                // CorrelationId: This is a unique identifier used internally to track and monitor operations in ScheduledActions
+                var correlationId = Guid.NewGuid().ToString();
 
+                // The request body for the executestart operation on virtual machines
+                var executeStartRequest = new ExecuteStartContent(retryPolicy, new UserRequestResources(resourceIds), correlationId);
+
+                StartResourceOperationResult? result = await subscriptionResource.ExecuteVirtualMachineStartAsync(location, executeStartRequest);
+
+                /// <summary>
+                /// Each operationId corresponds to a virtual machine operation in ScheduledActions. 
+                /// The method below excludes resources that have not been processed in ScheduledActions due to a number of reasons 
+                /// like operation conflicts, virtual machines not being found in an Azure location etc 
+                /// and returns only the valid operations that have passed validation checks to be polled.
+                /// </summary>
+                var validOperationIds = UtilityMethods.ExcludeResourcesNotProcessed(result.Results);
+                completedOperations.Clear();
+
+                if (validOperationIds.Count > 0)
+                {
+                    await UtilityMethods.PollOperationStatus(validOperationIds, completedOperations, location, subscriptionResource);
+                }
+                else
+                {
+                    Console.WriteLine("No valid operations to poll");
+                    return;
+                }
+            }
+            catch (RequestFailedException ex)
+            {
+                /// <summary>
+                /// Request examples that could make a request fall into this catch block include:
+                /// VALIDATION ERRORS:
+                /// - No resourceids provided in request
+                /// - Over 100 resourceids provided in request
+                /// - RetryPolicy.RetryCount value > 7
+                /// - RetryPolicy.RetryWindowInMinutes value > 120
+                /// COMPUTESCHEDULE BLOCKING ERRORS:
+                /// - Scheduling Operations Blocked due to an ongoing outage in downstream services
+                /// - Non-Scheduling Operations Blocked, eg VirtualMachinesGetOperationStatus operations, due to an ongoing outage in downstream services
+                /// </summary>
+                Console.WriteLine($"Request failed with ErrorCode:{ex.ErrorCode} and ErrorMessage: {ex.Message}");
+
+                if (ex.ErrorCode != null && blockedOperationsException.Contains(ex.ErrorCode))
+                {
+                    /// Operation blocking on scheduling/non-scheduling actions can be due to scenarios like outages in downstream services.
+                    Console.WriteLine($"Operation Blocking is turned on, request may succeed later.");
+                }
+                throw;
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.InnerException?.Message);
+                Console.WriteLine($"Request failed with Exception:{ex.Message}");
                 throw;
             }
-
-            return result;
-        }
-
-        private static async Task<DeallocateResourceOperationResult> TestExecuteDeallocateAsync(string location, ExecuteDeallocateContent executeDeallocateRequest, string subid)
-        {
-            TokenCredential cred = new DefaultAzureCredential();
-            ArmClient client = new(cred);
-            string subscriptionId = subid;
-            ResourceIdentifier subscriptionResourceId = SubscriptionResource.CreateResourceIdentifier(subscriptionId);
-            SubscriptionResource subscriptionResource = client.GetSubscriptionResource(subscriptionResourceId);
-            string locationparameter = location;
-            ExecuteDeallocateContent content = executeDeallocateRequest;
-
-            DeallocateResourceOperationResult? result;
-            try
-            {
-                result = await subscriptionResource.ExecuteVirtualMachineDeallocateAsync(locationparameter, content);
-                Console.WriteLine($"Succeeded: {result}");
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.InnerException?.Message);
-                throw;
-            }
-
-            return result;
-
-        }
-
-        private static async Task<HibernateResourceOperationResult> TestExecuteHibernateAsync(string location, ExecuteHibernateContent executeHibernateRequest, string subid)
-        {
-            TokenCredential cred = new DefaultAzureCredential();
-            ArmClient client = new(cred);
-            string subscriptionId = subid;
-            ResourceIdentifier subscriptionResourceId = SubscriptionResource.CreateResourceIdentifier(subscriptionId);
-            SubscriptionResource subscriptionResource = client.GetSubscriptionResource(subscriptionResourceId);
-            string locationparameter = location;
-            ExecuteHibernateContent content = executeHibernateRequest;
-            HibernateResourceOperationResult? result;
-
-            try
-            {
-                result = await subscriptionResource.ExecuteVirtualMachineHibernateAsync(locationparameter, content);
-                Console.WriteLine($"Succeeded: {result}");
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.InnerException?.Message);
-                throw;
-            }
-
-            return result;
-        }
-
-        public static async Task<CancelOperationsResult> TestCancelOpsAsync(string location, CancelOperationsContent cancelOpsRequest, string subid)
-        {
-            TokenCredential cred = new DefaultAzureCredential();
-
-            ArmClient client = new(cred);
-            string subscriptionId = subid;
-            ResourceIdentifier subscriptionResourceId = SubscriptionResource.CreateResourceIdentifier(subscriptionId);
-            SubscriptionResource subscriptionResource = client.GetSubscriptionResource(subscriptionResourceId);
-            string locationparameter = location;
-            CancelOperationsContent content = cancelOpsRequest;
-            CancelOperationsResult? result;
-
-            try
-            {
-                result = await subscriptionResource.CancelVirtualMachineOperationsAsync(locationparameter, content);
-                Console.WriteLine($"Succeeded: {result}");
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.InnerException?.Message);
-                throw;
-            }
-
-            return result;
-        }
-
-        public static async Task<GetOperationStatusResult> TestGetOpsStatusAsync(string location, GetOperationStatusContent getOpsStatusRequest, string subid)
-        {
-            TokenCredential cred = new DefaultAzureCredential();
-
-            ArmClient client = new(cred);
-            string subscriptionId = subid;
-            ResourceIdentifier subscriptionResourceId = SubscriptionResource.CreateResourceIdentifier(subscriptionId);
-            SubscriptionResource subscriptionResource = client.GetSubscriptionResource(subscriptionResourceId);
-            string locationparameter = location;
-            GetOperationStatusContent content = getOpsStatusRequest;
-            GetOperationStatusResult? result;
-
-            try
-            {
-                result = await subscriptionResource.GetVirtualMachineOperationStatusAsync(locationparameter, content);
-                Console.WriteLine($"Succeeded: {result}");
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.InnerException?.Message);
-                throw;
-            }
-
-            return result;
-        }
-
-        public static async Task<GetOperationErrorsResult> TestGetOpsErrorsAsync(string location, GetOperationErrorsContent getOpsErrorsRequest, string subid)
-        {
-            TokenCredential cred = new DefaultAzureCredential();
-
-            ArmClient client = new(cred);
-            string subscriptionId = subid;
-            ResourceIdentifier subscriptionResourceId = SubscriptionResource.CreateResourceIdentifier(subscriptionId);
-            SubscriptionResource subscriptionResource = client.GetSubscriptionResource(subscriptionResourceId);
-            string locationparameter = location;
-            GetOperationErrorsContent content = getOpsErrorsRequest;
-            GetOperationErrorsResult? result;
-
-            try
-            {
-                result = await subscriptionResource.GetVirtualMachineOperationErrorsAsync(locationparameter, content);
-                Console.WriteLine($"Succeeded: {result}");
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.InnerException?.Message);
-                throw;
-            }
-
-            return result;
         }
     }
 }
