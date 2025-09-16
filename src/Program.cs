@@ -1,29 +1,29 @@
-﻿using Azure.Core;
+using Azure.Core;
 using Azure.Identity;
 using Azure.ResourceManager;
 using Azure.ResourceManager.ComputeSchedule;
 using Azure.ResourceManager.ComputeSchedule.Models;
 using Azure.ResourceManager.Resources;
 using System.ClientModel.Primitives;
+using System.Resources;
 
 namespace ComputeScheduleSampleProject
 {
     internal static class Program
     {
         /// <summary>
-        /// This project shows a sample use case for the ComputeSchedule SDK
+        /// This project shows a sample use case for the ComputeSchedule use case
         /// </summary>
         private static void Main(string[] args)
         {
             // Testing the ExecuteStart operation
-            // add a fake guid for subid and fake name of vm
-            var executeStartRequest = new ExecuteStartContent(new ExecutionParameters(), new Resources(["/subscriptions/afe495ca-b99a-4e36-86c8-9e0e41697f1c/resourcegroups/Kronox_SyntheticRuns_EastAsia/providers/Microsoft.Compute/virtualMachines/nneka-computeschedule-testvm"]), Guid.NewGuid().ToString());
+            var executeStartRequest = new ExecuteStartContent(new ExecutionParameters(), new Resources(new List<string>() { "/subscriptions/afe495ca-b99a-4e36-86c8-9e0e41697f1c/resourcegroups/Kronox_SyntheticRuns_EastAsia/providers/Microsoft.Compute/virtualMachines/nneka-computeschedule-testvm" }), Guid.NewGuid().ToString());
             var executeStartResult = TestExecuteStartAsync("eastasia", executeStartRequest, "afe495ca-b99a-4e36-86c8-9e0e41697f1c").Result;
 
             var executeStartProcessedData = ModelReaderWriter.Write(executeStartResult, ModelReaderWriterOptions.Json);
             Console.WriteLine(executeStartProcessedData.ToString());
 
-            // add a fake guid for subid
+
             // Testing the GetOperationStatus operation
             var allOperationIds = executeStartResult.Results.Select(result => result.Operation?.OperationId).Where(operationId => !string.IsNullOrEmpty(operationId)).ToList();
             var getOpsStatusReq = new GetOperationStatusContent(allOperationIds, Guid.NewGuid().ToString());
