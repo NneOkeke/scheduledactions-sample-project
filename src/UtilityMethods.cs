@@ -194,7 +194,7 @@ namespace ComputeScheduleSampleProject
         /// <param name="completedOps"> Dictionary of completed operations, that is, operations where state is either Succeeded, Failed, Cancelled </param>
         /// <param name="allOps"></param>
         /// <returns></returns>
-        private static HashSet<string?> ExcludeCompletedOperations(Dictionary<string, ResourceOperationDetails> completedOps, HashSet<string?> allOps)
+        private static HashSet<string?> ExcludeCompletedOperations(Dictionary<string, ResourceOperationDetails> completedOps, HashSet<string> allOps)
         {
             var incompleteOps = new HashSet<string?>(allOps);
 
@@ -215,9 +215,9 @@ namespace ComputeScheduleSampleProject
         /// </summary>
         /// <param name="results"></param>
         /// <returns></returns>
-        public static HashSet<string?> ExcludeResourcesNotProcessed(IEnumerable<ResourceOperationResult> results)
+        public static Dictionary<string, ResourceIdentifier?> ExcludeResourcesNotProcessed(IEnumerable<ResourceOperationResult> results)
         {
-            var validOperationIds = new HashSet<string?>();
+            var validOperations = new Dictionary<string, ResourceIdentifier?>();
             foreach (var result in results)
             {
                 if (result.ErrorCode != null)
@@ -232,10 +232,10 @@ namespace ComputeScheduleSampleProject
                 }
                 else
                 {
-                    validOperationIds.Add(result.Operation.OperationId);
+                    validOperations.Add(result.Operation.OperationId, result.ResourceId);
                 }
             }
-            return validOperationIds;
+            return validOperations;
         }
 
         /// <summary>
@@ -248,7 +248,7 @@ namespace ComputeScheduleSampleProject
         /// <param name="resource"> ARM subscription resource </param>
         /// <returns></returns>
 
-        public static async Task PollOperationStatus(HashSet<string?> opIdsFromOperationReq, Dictionary<string, ResourceOperationDetails> completedOps, string location, SubscriptionResource resource)
+        public static async Task PollOperationStatus(HashSet<string> opIdsFromOperationReq, Dictionary<string, ResourceOperationDetails> completedOps, string location, SubscriptionResource resource)
         {
             await Task.Delay(InitialWaitTimeBeforePollingInSeconds);
 
