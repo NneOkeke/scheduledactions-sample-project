@@ -67,10 +67,14 @@ namespace ComputeScheduleSampleProject
         /// <summary>
         /// This method details the happy path for executing a create type operation in ScheduledActions
         /// </summary>
+        /// <param name="completedOperations">Hashset of completed operations to track</param>
+        /// <param name="executionParameterDetail">Execution parameters for the request</param>
         /// <param name="subscriptionResource">Subscription resource with Computeschedule operations</param>
         /// <param name="subscriptionId">SubscriptionId for request</param>
         /// <param name="blockedOperationsException">Exceptions representing blocked operations</param>
         /// <param name="location">Location of the virtual machines operation</param>
+        /// <param name="rgName">Resource group name of the virtual machines</param>
+        /// <param name="subscriptionId">Subscription Id of the virtual machines</param>
         private static async Task ScheduledActions_ExecuteCreateOperation(
             Dictionary<string, ResourceOperationDetails> completedOperations,
             ScheduledActionExecutionParameterDetail executionParameterDetail,
@@ -163,6 +167,7 @@ namespace ComputeScheduleSampleProject
         /// This method details the happy path for executing an execute type operation in ScheduledActions
         /// </summary>
         /// <param name="completedOperations">Hashset of completed operations to track</param>
+        /// <param name="executionParameterDetail">Execution parameters for the request</param>
         /// <param name="retryPolicy">User retry policy values</param>
         /// <param name="subscriptionResource">Subscription resource with Computeschedule operations</param>
         /// <param name="blockedOperationsException">Exceptions representing blocked operations</param>
@@ -171,7 +176,7 @@ namespace ComputeScheduleSampleProject
         /// <returns></returns>
         private static async Task ScheduledActions_ExecuteStartOperation(
             Dictionary<string, ResourceOperationDetails> completedOperations,
-            ScheduledActionExecutionParameterDetail retryPolicy,
+            ScheduledActionExecutionParameterDetail executionParameterDetail,
             SubscriptionResource subscriptionResource,
             HashSet<string> blockedOperationsException,
             string location,
@@ -183,7 +188,7 @@ namespace ComputeScheduleSampleProject
                 var correlationId = Guid.NewGuid().ToString();
 
                 // The request body for the executestart operation on virtual machines
-                var executeStartRequest = new ExecuteStartContent(retryPolicy, new UserRequestResources(resourceIds), correlationId);
+                var executeStartRequest = new ExecuteStartContent(executionParameterDetail, new UserRequestResources(resourceIds), correlationId);
 
                 StartResourceOperationResult? result = await subscriptionResource.ExecuteVirtualMachineStartAsync(location, executeStartRequest);
 

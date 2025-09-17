@@ -300,8 +300,7 @@ namespace ComputeScheduleSampleProject
                                                         properties = new {
                                                             defaultoutboundaccess = false,
                                                         }
-                                                    },
-                                                    privateIPAllocationMethod = "Dynamic"
+                                                    }
                                                 }
                                             }
                                         }
