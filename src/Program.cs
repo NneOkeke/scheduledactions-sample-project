@@ -46,22 +46,25 @@ namespace ComputeScheduleSampleProject
                 }
             };
 
-            // List of virtual machine resource identifiers to perform execute/submit type operations on, in this case, we are using dummy VMs. Virtual Machines must all be under the same subscriptionid
-            var resourceIds = new List<ResourceIdentifier>()
-            {
-                new($"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/dummy-vm-600"),
-                new($"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/dummy-vm-611"),
-                new($"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/dummy-vm-612"),
-            };
-
             // Execute type operation: Start operation on virtual machines
-            await ScheduledActions_ExecuteStartOperation(
+            //await ScheduledActions_ExecuteStartOperation(
+            //    completedOperations,
+            //    executionParams,
+            //    subscriptionResource,
+            //    blockedOperationsException,
+            //    location,
+            //    subscriptionId,
+            //    resourceGroupName);
+
+            // Create type operation: Create operation on virtual machines
+            await ScheduledActions_ExecuteCreateOperation(
                 completedOperations,
                 executionParams,
                 subscriptionResource,
                 blockedOperationsException,
                 location,
-                resourceIds);
+                resourceGroupName,
+                subscriptionId);
         }
 
         /// <summary>
@@ -180,8 +183,17 @@ namespace ComputeScheduleSampleProject
             SubscriptionResource subscriptionResource,
             HashSet<string> blockedOperationsException,
             string location,
-            List<ResourceIdentifier> resourceIds)
+            string subscriptionId,
+            string resourceGroupName)
         {
+            // List of virtual machine resource identifiers to perform execute/submit type operations on, in this case, we are using dummy VMs. Virtual Machines must all be under the same subscriptionid
+            var resourceIds = new List<ResourceIdentifier>()
+            {
+                new($"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/dummy-vm-600"),
+                new($"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/dummy-vm-611"),
+                new($"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/dummy-vm-612"),
+            };
+
             try
             {
                 // CorrelationId: This is a unique identifier used internally to track and monitor operations in ScheduledActions
