@@ -5,6 +5,7 @@ using Azure.ResourceManager;
 using Azure.ResourceManager.ComputeSchedule;
 using Azure.ResourceManager.ComputeSchedule.Models;
 using Azure.ResourceManager.Resources;
+using System.ClientModel.Primitives;
 
 namespace ComputeScheduleSampleProject
 {
@@ -18,13 +19,13 @@ namespace ComputeScheduleSampleProject
             var blockedOperationsException = new HashSet<string> { "SchedulingOperationsBlockedException", "NonSchedulingOperationsBlockedException" };
 
             // Location: The location of the virtual machines
-            const string location = "eastasia";
+            const string location = "eastus2euap";
 
             // SubscriptionId: The subscription id under which the virtual machines are located, in this case, we are using a dummy subscriptionId
-            const string subscriptionId = "d93f78f2-e878-40c2-9d5d-dcfdbb8042a0";
+            const string subscriptionId = "adc9873a-2cc4-496f-83a7-f7ae15b4d45e";
 
             // ResourceGroupName: The resource group name under which the virtual machines are located, in this case, we are using a dummy resource group name
-            const string resourceGroupName = "ScheduledActions_Baseline_EastAsia";
+            const string resourceGroupName = "demo-rg";
 
             Dictionary<string, ResourceOperationDetails> completedOperations = [];
             // Credential: The Azure credential used to authenticate the request
@@ -87,8 +88,6 @@ namespace ComputeScheduleSampleProject
             string rgName,
             string subscriptionId)
         {
-            try
-            {
                 // CorrelationId: This is a unique identifier used internally to track and monitor operations in ScheduledActions
                 var correlationId = Guid.NewGuid().ToString();
 
@@ -115,6 +114,11 @@ namespace ComputeScheduleSampleProject
                     true
                     );
 
+            var createOps = ModelReaderWriter.Write(executecreatecontent, ModelReaderWriterOptions.Json);
+            Console.WriteLine(createOps.ToString());
+
+            try
+            {
                 // Execute the create operation
                 CreateResourceOperationResult? result = await subscriptionResource.ExecuteVirtualMachineCreateOperationAsync(location, executecreatecontent);
 

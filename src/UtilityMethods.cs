@@ -3,6 +3,7 @@ using Azure.ResourceManager;
 using Azure.ResourceManager.ComputeSchedule;
 using Azure.ResourceManager.ComputeSchedule.Models;
 using Azure.ResourceManager.Resources;
+using System.ClientModel.Primitives;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -10,6 +11,109 @@ namespace ComputeScheduleSampleProject
 {
     public static class UtilityMethods
     {
+        // Static JSON representation for create vm operations
+
+        private static readonly string CreateVmJsonContent = @"
+            {
+              ""resourceConfigParameters"": {
+                ""resourceCount"": 1,
+                ""baseProfile"": {
+                  ""resourcegroupName"": ""computeschedule-azcliext-resources"",
+                  ""computeApiVersion"": ""2023-09-01"",
+                  ""properties"": {
+                    ""vmExtensions"": [
+                      {
+                        ""name"": ""Microsoft.Azure.Geneva.GenevaMonitoring"",
+                        ""location"": ""eastus2euap"",
+                        ""properties"": {
+                          ""autoUpgradeMinorVersion"": true,
+                          ""enableAutomaticUpgrade"": true,
+                          ""suppressFailures"": true,
+                          ""publisher"": ""Microsoft.Azure.Geneva"",
+                          ""type"": ""GenevaMonitoring"",
+                          ""typeHandlerVersion"": ""2.0""
+                        }
+                      }
+                    ],
+                    ""hardwareProfile"": {
+                      ""vmSize"": ""Standard_D2ads_v5""
+                    },
+                    ""storageProfile"": {
+                      ""imageReference"": {
+                        ""publisher"": ""MicrosoftWindowsServer"",
+                        ""offer"": ""WindowsServer"",
+                        ""sku"": ""2022-datacenter-azure-edition"",
+                        ""version"": ""latest""
+                      },
+                      ""osDisk"": {
+                        ""osType"": ""Windows"",
+                        ""createOption"": ""FromImage"",
+                        ""caching"": ""ReadWrite"",
+                        ""managedDisk"": {
+                          ""storageAccountType"": ""Standard_LRS""
+                        },
+                        ""deleteOption"": ""Detach"",
+                        ""diskSizeGB"": 127
+                      },
+                      ""diskControllerType"": ""SCSI""
+                    },
+                    ""networkProfile"": {
+                      ""networkInterfaceConfigurations"": [
+                        {
+                          ""name"": ""vmTest"",
+                          ""properties"": {
+                            ""primary"": true,
+                            ""enableIPForwarding"": true,
+                            ""ipConfigurations"": [
+                              {
+                                ""name"": ""vmTest"",
+                                ""properties"": {
+                                  ""subnet"": {
+                                    ""id"": ""/subscriptions/38dcfe37-18ca-4560-b49e-4ddcd6423cc5/resourceGroups/computeschedule-azcliext-resources/providers/Microsoft.Network/virtualNetworks/kronox-vnet/subnets/default"",
+                                    ""properties"": {
+                                      ""defaultoutboundaccess"": false
+                                    }
+                                  },
+                                  ""primary"": true,
+                                  ""applicationGatewayBackendAddressPools"": [],
+                                  ""loadBalancerBackendAddressPools"": []
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ],
+                      ""networkApiVersion"": ""2022-07-01""
+                    }
+                  }
+                },
+                ""resourceOverrides"": [
+                  {
+                    ""name"": ""validvmtestTwo"",
+                    ""location"": ""eastus2euap"",
+                    ""properties"": {
+                      ""hardwareProfile"": {
+                        ""vmSize"": ""Standard_D2ads_v5""
+                      },
+                      ""osProfile"": {
+                        ""computerName"": ""validtestTwo"",
+                        ""adminUsername"": ""testUserName"",
+                        ""adminPassword"": ""YourStr0ngP@ssword123!"",
+                        ""windowsConfiguration"": {
+                          ""provisionVmAgent"": true,
+                          ""enableAutomaticUpdates"": true,
+                          ""patchSettings"": {
+                            ""patchMode"": ""AutomaticByPlatform"",
+                            ""assessmentMode"": ""ImageDefault""
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }";
+
         // Amount of time to wait between each polling request
         private static readonly int PollingIntervalInSeconds = 15;
 
@@ -62,6 +166,7 @@ namespace ComputeScheduleSampleProject
                 var operationState = operation.State;
                 var operationError = operation.ResourceOperationError;
 
+                Console.WriteLine($"Trying polling for operation with id {operationId}.");
                 if (IsOperationStateComplete(operationState))
                 {
                     completedOps.TryAdd(operationId, operation);
@@ -157,6 +262,8 @@ namespace ComputeScheduleSampleProject
 
                 if (!ShouldRetryPolling(response, opIdsFromOperationReq.Count, completedOps))
                 {
+                    var finalRes = ModelReaderWriter.Write(response, ModelReaderWriterOptions.Json);
+                    Console.WriteLine(finalRes.ToString());
                     break;
                 }
                 else
@@ -167,6 +274,14 @@ namespace ComputeScheduleSampleProject
                 }
 
                 await Task.Delay(TimeSpan.FromSeconds(PollingIntervalInSeconds), cts.Token);
+            }
+        }
+
+        public static void PrintDictionaryContents(IDictionary<string, BinaryData> dict)
+        {
+            foreach (var kvp in dict)
+            {
+                Console.WriteLine($"{kvp.Key}: {kvp.Value}");
             }
         }
 
@@ -188,27 +303,27 @@ namespace ComputeScheduleSampleProject
         {
             var resourceOverrideDetail = new Dictionary<string, BinaryData>
             {
-                { "name", BinaryData.FromString(name) },
-                { "location", BinaryData.FromString(locationProperty) },
+                { "name", BinaryData.FromObjectAsJson(name) },
+                { "location", BinaryData.FromObjectAsJson(locationProperty) },
                 { "properties", BinaryData.FromObjectAsJson(new {
                     hardwareProfile = new {
                         vmSize = vmsize
-                    }
-                })
-                },
-                { "osProfile", BinaryData.FromObjectAsJson(new {
-                    computerName = name,
-                    adminUsername = adminUsername,
-                    adminPassword = password,
-                    windowsConfiguration = new {
-                        provisionVmAgent = true,
-                        enableAutomaticUpdates = true,
-                        patchSettings = new {
-                            patchMode = "AutomaticByPlatform",
-                            assessmentMode = "ImageDefault"
+                    },
+                    osProfile = new {
+                        computerName = name,
+                        adminUsername = adminUsername,
+                        adminPassword = password,
+                        windowsConfiguration = new {
+                            provisionVmAgent = true,
+                            enableAutomaticUpdates = true,
+                            patchSettings = new {
+                                patchMode = "AutomaticByPlatform",
+                                assessmentMode = "ImageDefault"
+                            }
                         }
                     }
-                }) }
+                })
+                }
             };
 
             return resourceOverrideDetail;
@@ -244,8 +359,8 @@ namespace ComputeScheduleSampleProject
                 ResourcePrefix = resourcePrefix,
                 BaseProfile =
                 {
-                    { "resourcegroupName", BinaryData.FromString(rgName) },
-                    { "computeApiVersion", BinaryData.FromString("2023-09-01") },
+                    { "resourcegroupName", BinaryData.FromObjectAsJson(rgName) },
+                    { "computeApiVersion", BinaryData.FromObjectAsJson("2023-09-01") },
                     { "properties", BinaryData.FromObjectAsJson(new {
                         vmExtensions = new[]{
                             new {
@@ -262,7 +377,7 @@ namespace ComputeScheduleSampleProject
                             }
                         },
                         hardwareProfile = new {
-                            vmSize = "Standard_DS1_v2"
+                            vmSize = "Standard_D2s_v3"
                         },
                         storageProfile = new {
                             imageReference = new {
@@ -308,7 +423,8 @@ namespace ComputeScheduleSampleProject
                                 }
                             }
                         }
-                    }) }
+                    })
+                    }
                 }
             };
 
