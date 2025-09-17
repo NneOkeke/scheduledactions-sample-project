@@ -1,9 +1,10 @@
 ﻿using Azure.Core;
-using Azure.Identity;
 using Azure.ResourceManager;
 using Azure.ResourceManager.ComputeSchedule;
 using Azure.ResourceManager.ComputeSchedule.Models;
 using Azure.ResourceManager.Resources;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace ComputeScheduleSampleProject
 {
@@ -167,6 +168,216 @@ namespace ComputeScheduleSampleProject
 
                 await Task.Delay(TimeSpan.FromSeconds(PollingIntervalInSeconds), cts.Token);
             }
+        }
+
+
+        /// <summary>
+        /// Generates a resource override item for virtual machines
+        /// </summary>
+        /// <param name="name">Name of the virtual machine</param>
+        /// <param name="locationProperty">Location of the virtual machine</param>
+        /// <param name="vmsize">Size of the virtual machine</param>
+        /// <param name="password">Admin password for the virtual machine</param>
+        /// <param name="adminUsername">Admin username for the virtual machine</param>
+        public static Dictionary<string, BinaryData> GenerateResourceOverrideItem(
+            string name,
+            string locationProperty,
+            string vmsize,
+            string password,
+            string adminUsername)
+        {
+            var resourceOverrideDetail = new Dictionary<string, BinaryData>
+            {
+                { "name", BinaryData.FromString(name) },
+                { "location", BinaryData.FromString(locationProperty) },
+                { "properties", BinaryData.FromObjectAsJson(new {
+                    hardwareProfile = new {
+                        vmSize = vmsize
+                    }
+                })
+                },
+                { "osProfile", BinaryData.FromObjectAsJson(new {
+                    computerName = name,
+                    adminUsername = adminUsername,
+                    adminPassword = password,
+                    windowsConfiguration = new {
+                        provisionVmAgent = true,
+                        enableAutomaticUpdates = true,
+                        patchSettings = new {
+                            patchMode = "AutomaticByPlatform",
+                            assessmentMode = "ImageDefault"
+                        }
+                    }
+                }) }
+            };
+
+            return resourceOverrideDetail;
+        }
+
+        /// <summary>
+        /// Builds the execute create request content for virtual machines
+        /// </summary>
+        /// <param name="resourcePrefix">Resource prefix for the virtual machines</param>
+        /// <param name="correlationId">Correlation ID for the request</param>
+        /// <param name="resourceCount">Number of virtual machines to create</param>
+        /// <param name="executionParameter">Execution parameters for the request</param>
+        /// <param name="rgName">Resource group name</param>
+        /// <param name="vnetName">Virtual network name</param>
+        /// <param name="subnetName">Subnet name</param>
+        /// <param name="azureLocation">Azure location</param>
+        /// <param name="resourceOverrideDetail">Resource override details</param>
+        public static ExecuteCreateContent BuildExecuteCreateRequest(
+            string resourcePrefix,
+            string correlationId,
+            int resourceCount,
+            ScheduledActionExecutionParameterDetail executionParameter,
+            string rgName,
+            string vnetName,
+            string subnetName,
+            string azureLocation,
+            List<Dictionary<string, BinaryData>> resourceOverrideDetail,
+            string subId,
+            bool enableResourceOverride = false)
+        {
+            var payload = new ResourceProvisionPayload(resourceCount)
+            {
+                ResourcePrefix = resourcePrefix,
+                BaseProfile =
+                {
+                    { "resourcegroupName", BinaryData.FromString(rgName) },
+                    { "computeApiVersion", BinaryData.FromString("2023-09-01") },
+                    { "properties", BinaryData.FromObjectAsJson(new {
+                        vmExtensions = new[]{
+                            new {
+                                name = "Microsoft.Azure.Geneva.GenevaMonitoring",
+                                location = azureLocation,
+                                properties = new {
+                                    publisher = "Microsoft.Azure.Geneva",
+                                    type = "GenevaMonitoring",
+                                    typeHandlerVersion = "2.0",
+                                    autoUpgradeMinorVersion = true,
+                                    enableAutomaticUpgrade = true,
+                                    suppressFailures = true
+                                }
+                            }
+                        },
+                        hardwareProfile = new {
+                            vmSize = "Standard_DS1_v2"
+                        },
+                        storageProfile = new {
+                            imageReference = new {
+                                publisher = "MicrosoftWindowsServer",
+                                offer = "WindowsServer",
+                                sku = "2022-datacenter-azure-edition",
+                                version = "latest"
+                            },
+                            osDisk = new {
+                                createOption = "FromImage",
+                                osType = "Windows",
+                                caching = "ReadWrite",
+                                managedDisk = new {
+                                    storageAccountType = "Standard_LRS"
+                                },
+                                deleteOption = "Detach",
+                                diskSizeGB = 127,
+                            }
+                        },
+                        networkProfile = new {
+                            networkApiVersion = "2022-07-01",
+                            networkInterfaceConfigurations = new[] {
+                                new {
+                                    name = "vmTest",
+                                    properties = new {
+                                        primary = true,
+                                        enableIPForwarding = true,
+                                        ipConfigurations = new[] {
+                                            new {
+                                                name = "vmTest",
+                                                properties = new {
+                                                    primary = true,
+                                                    subnet = new {
+                                                        id = $"/subscriptions/{subId}/resourceGroups/{rgName}/providers/Microsoft.Network/virtualNetworks/{vnetName}/subnets/{subnetName}",
+                                                        properties = new {
+                                                            defaultoutboundaccess = false,
+                                                        }
+                                                    },
+                                                    privateIPAllocationMethod = "Dynamic"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }) }
+                }
+            };
+
+            if (enableResourceOverride)
+            {
+                if (resourceOverrideDetail.Count < resourceCount)
+                {
+                    throw new Exception("Resource override count must == " + resourceCount);
+                }
+
+                foreach (var overrideDict in resourceOverrideDetail)
+                {
+                    payload.ResourceOverrides.Add(overrideDict);
+                }
+            }
+
+            return new ExecuteCreateContent(payload, executionParameter)
+            {
+                CorrelationId = correlationId
+            };
+        }
+
+
+        /// <summary>
+        /// Builds the execute create request content from JSON body for virtual machines
+        /// </summary>
+        /// <param name="jsonContent">JSON content for the request</param>
+        /// <param name="resourcePrefix">Resource prefix for the virtual machines</param>
+        /// <param name="correlationId">Correlation ID for the request</param>
+        /// <param name="resourceCount">Number of virtual machines to create</param>
+        /// <param name="executionParameter">Execution parameters for the request</param>
+        public static ExecuteCreateContent BuildExecuteCreateRequestFromJsonContent(
+            string jsonContent,
+            string resourcePrefix,
+            string correlationId,
+            int resourceCount,
+            ScheduledActionExecutionParameterDetail executionParameter)
+        {
+            var root = JsonNode.Parse(jsonContent)!;
+
+            var resourceConfig = root["resourceConfigParameters"]!;
+            var baseProfileNode = resourceConfig["baseProfile"]!;
+            var resourceOverridesNode = resourceConfig["resourceOverrides"]?.AsArray() ?? [];
+
+            var payload = new ResourceProvisionPayload(resourceCount)
+            {
+                ResourcePrefix = resourcePrefix
+            };
+
+            foreach (var prop in baseProfileNode.AsObject())
+            {
+                payload.BaseProfile[prop.Key] = BinaryData.FromObjectAsJson(prop.Value!.Deserialize<object>());
+            }
+
+            foreach (var overrideNode in resourceOverridesNode)
+            {
+                var overrideDict = new Dictionary<string, BinaryData>();
+                foreach (var prop in overrideNode!.AsObject())
+                {
+                    overrideDict[prop.Key] = BinaryData.FromObjectAsJson(prop.Value!.Deserialize<object>());
+                }
+                payload.ResourceOverrides.Add(overrideDict);
+            }
+
+            return new ExecuteCreateContent(payload, executionParameter)
+            {
+                CorrelationId = correlationId
+            };
         }
     }
 }

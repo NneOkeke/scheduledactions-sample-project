@@ -23,6 +23,9 @@ namespace ComputeScheduleSampleProject
             // SubscriptionId: The subscription id under which the virtual machines are located, in this case, we are using a dummy subscriptionId
             const string subscriptionId = "d93f78f2-e878-40c2-9d5d-dcfdbb8042a0";
 
+            // ResourceGroupName: The resource group name under which the virtual machines are located, in this case, we are using a dummy resource group name
+            const string resourceGroupName = "ScheduledActions_Baseline_EastAsia";
+
             Dictionary<string, ResourceOperationDetails> completedOperations = [];
             // Credential: The Azure credential used to authenticate the request
             TokenCredential cred = new DefaultAzureCredential();
@@ -46,9 +49,9 @@ namespace ComputeScheduleSampleProject
             // List of virtual machine resource identifiers to perform execute/submit type operations on, in this case, we are using dummy VMs. Virtual Machines must all be under the same subscriptionid
             var resourceIds = new List<ResourceIdentifier>()
             {
-                new($"/subscriptions/{subscriptionId}/resourceGroups/ScheduledActions_Baseline_EastAsia/providers/Microsoft.Compute/virtualMachines/dummy-vm-600"),
-                new($"/subscriptions/{subscriptionId}/resourceGroups/ScheduledActions_Baseline_EastAsia/providers/Microsoft.Compute/virtualMachines/dummy-vm-611"),
-                new($"/subscriptions/{subscriptionId}/resourceGroups/ScheduledActions_Baseline_EastAsia/providers/Microsoft.Compute/virtualMachines/dummy-vm-612"),
+                new($"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/dummy-vm-600"),
+                new($"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/dummy-vm-611"),
+                new($"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/dummy-vm-612"),
             };
 
             // Execute type operation: Start operation on virtual machines
@@ -56,21 +59,123 @@ namespace ComputeScheduleSampleProject
                 completedOperations,
                 executionParams,
                 subscriptionResource,
-                subscriptionId,
                 blockedOperationsException,
                 location,
                 resourceIds);
         }
 
         /// <summary>
+        /// This method details the happy path for executing a create type operation in ScheduledActions
+        /// </summary>
+        /// <param name="subscriptionResource">Subscription resource with Computeschedule operations</param>
+        /// <param name="subscriptionId">SubscriptionId for request</param>
+        /// <param name="blockedOperationsException">Exceptions representing blocked operations</param>
+        /// <param name="location">Location of the virtual machines operation</param>
+        private static async Task ScheduledActions_ExecuteCreateOperation(
+            Dictionary<string, ResourceOperationDetails> completedOperations,
+            ScheduledActionExecutionParameterDetail executionParameterDetail,
+            SubscriptionResource subscriptionResource,
+            HashSet<string> blockedOperationsException,
+            string location,
+            string rgName,
+            string subscriptionId)
+        {
+            try
+            {
+                // CorrelationId: This is a unique identifier used internally to track and monitor operations in ScheduledActions
+                var correlationId = Guid.NewGuid().ToString();
+
+                // resource overrides generation for the create operation
+                var resourceOverrideOne = UtilityMethods.GenerateResourceOverrideItem(
+                    "vmTestOne",
+                    location,
+                    "Standard_D2ads_v5",
+                    "YourStr0ngP@ssword123!",
+                    "testUserName");
+
+                // The request body for the executecreate operation on virtual machines
+                var executecreatecontent = UtilityMethods.BuildExecuteCreateRequest(
+                    "testCreate_Sdk",
+                    correlationId,
+                    1,
+                    executionParameterDetail,
+                    rgName,
+                    "testvnet",
+                    "testsubnet",
+                    location,
+                    [resourceOverrideOne],
+                    subscriptionId,
+                    true
+                    );
+
+                // Execute the create operation
+                CreateResourceOperationResult? result = await subscriptionResource.ExecuteVirtualMachineCreateOperationAsync(location, executecreatecontent);
+
+                /// <summary>
+                /// Each operationId corresponds to a virtual machine operation in ScheduledActions. 
+                /// The method below excludes resources that have not been processed in ScheduledActions due to a number of reasons 
+                /// like operation conflicts, virtual machines not being found in an Azure location etc 
+                /// and returns only the valid operations that have passed validation checks to be polled.
+                /// </summary>
+                var validOperationIds = UtilityMethods.ExcludeResourcesNotProcessed(result.Results);
+                completedOperations.Clear();
+
+                if (validOperationIds.Count > 0)
+                {
+                    await UtilityMethods.PollOperationStatus(validOperationIds, completedOperations, location, subscriptionResource);
+                }
+                else
+                {
+                    Console.WriteLine("No valid operations to poll");
+                    return;
+                }
+            }
+            catch (RequestFailedException ex)
+            {
+                /// <summary>
+                /// Request examples that could make a request fall into this catch block include:
+                /// VALIDATION ERRORS:
+                /// - No resourceids provided in request
+                /// - Over 100 resourceids provided in request
+                /// - RetryPolicy.RetryCount value > 7
+                /// - RetryPolicy.RetryWindowInMinutes value > 120
+                /// COMPUTESCHEDULE BLOCKING ERRORS:
+                /// - Scheduling Operations Blocked due to an ongoing outage in downstream services
+                /// - Non-Scheduling Operations Blocked, eg VirtualMachinesGetOperationStatus operations, due to an ongoing outage in downstream services
+                /// </summary>
+                Console.WriteLine($"Request failed with ErrorCode:{ex.ErrorCode} and ErrorMessage: {ex.Message}");
+
+                if (ex.ErrorCode != null && blockedOperationsException.Contains(ex.ErrorCode))
+                {
+                    /// Operation blocking on scheduling/non-scheduling actions can be due to scenarios like outages in downstream services.
+                    Console.WriteLine($"Operation Blocking is turned on, request may succeed later.");
+                }
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Request failed with Exception:{ex.Message}");
+                throw;
+            }
+        }
+
+        /// <summary>
         /// This method details the happy path for executing an execute type operation in ScheduledActions
         /// </summary>
-        /// <param name="completedOperations"></param>
-        /// <param name="retryPolicy"></param>
-        /// <param name="subscriptionResource"></param>
-        /// <param name="subscriptionId"></param>
+        /// <param name="completedOperations">Hashset of completed operations to track</param>
+        /// <param name="retryPolicy">User retry policy values</param>
+        /// <param name="subscriptionResource">Subscription resource with Computeschedule operations</param>
+        /// <param name="blockedOperationsException">Exceptions representing blocked operations</param>
+        /// <param name="location">Location of the virtual machines operation</param>
+        /// <param name="resourceIds">ResourceIds to perform the Computeschedule execute operation on</param>
         /// <returns></returns>
-        private static async Task ScheduledActions_ExecuteStartOperation(Dictionary<string, ResourceOperationDetails> completedOperations, ScheduledActionExecutionParameterDetail retryPolicy, SubscriptionResource subscriptionResource, string subscriptionId, HashSet<string> blockedOperationsException, string location, List<ResourceIdentifier> resourceIds)
+        private static async Task ScheduledActions_ExecuteStartOperation(
+            Dictionary<string, ResourceOperationDetails> completedOperations,
+            ScheduledActionExecutionParameterDetail retryPolicy,
+            SubscriptionResource subscriptionResource,
+            HashSet<string> blockedOperationsException,
+            string location,
+            List<ResourceIdentifier> resourceIds)
         {
             try
             {
