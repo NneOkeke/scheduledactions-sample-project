@@ -22,10 +22,10 @@ namespace ComputeScheduleSampleProject
             const string location = "eastus2euap";
 
             // SubscriptionId: The subscription id under which the virtual machines are located, in this case, we are using a dummy subscriptionId
-            const string subscriptionId = "1d04e8f1-ee04-4056-b0b2-718f5bb45b04";
+            const string subscriptionId = "a4f8220e-84cb-47a6-b2c0-c1900805f616";
 
             // ResourceGroupName: The resource group name under which the virtual machines are located, in this case, we are using a dummy resource group name
-            const string resourceGroupName = "rg-nneka-computeschedule";
+            const string resourceGroupName = "demo-rg";
 
             Dictionary<string, ResourceOperationDetails> completedOperations = [];
             // Credential: The Azure credential used to authenticate the request
