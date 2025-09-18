@@ -1,4 +1,4 @@
-# ComputeScheduleSampleProject
+# Computeschedule Sample Project
 
 This project demonstrates how to use the Azure ComputeSchedule SDK to manage virtual machines (VMs) in Azure using scheduled actions. The sample covers creating, starting, and deleting VMs programmatically, including handling retries and operation polling.
 
