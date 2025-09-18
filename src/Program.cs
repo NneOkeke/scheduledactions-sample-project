@@ -22,10 +22,10 @@ namespace ComputeScheduleSampleProject
             const string location = "eastus2euap";
 
             // SubscriptionId: The subscription id under which the virtual machines are located, in this case, we are using a dummy subscriptionId
-            const string subscriptionId = "adc9873a-2cc4-496f-83a7-f7ae15b4d45e";
+            const string subscriptionId = "1d04e8f1-ee04-4056-b0b2-718f5bb45b04";
 
             // ResourceGroupName: The resource group name under which the virtual machines are located, in this case, we are using a dummy resource group name
-            const string resourceGroupName = "demo-rg";
+            const string resourceGroupName = "rg-nneka-computeschedule";
 
             Dictionary<string, ResourceOperationDetails> completedOperations = [];
             // Credential: The Azure credential used to authenticate the request
@@ -34,6 +34,7 @@ namespace ComputeScheduleSampleProject
             // Client: The Azure Resource Manager client used to interact with the Azure Resource Manager API
             ArmClient client = new(cred);
             var subscriptionResource = UtilityMethods.GetSubscriptionResource(client, subscriptionId);
+            var resourceGroupResource = await subscriptionResource.GetResourceGroupAsync(resourceGroupName);
 
             // Execution parameters for the request including the retry policy used by Scheduledactions to retry the operation in case of failures
             var executionParams = new ScheduledActionExecutionParameterDetail()
@@ -48,7 +49,7 @@ namespace ComputeScheduleSampleProject
             };
 
             // Execute type operation: Start operation on virtual machines
-            //await ScheduledActions_ExecuteStartOperation(
+            //await ExecuteStartOperation(
             //    completedOperations,
             //    executionParams,
             //    subscriptionResource,
@@ -57,30 +58,44 @@ namespace ComputeScheduleSampleProject
             //    subscriptionId,
             //    resourceGroupName);
 
-            // Create type operation: Create operation on virtual machines
-            //await ScheduledActions_ExecuteCreateOperation(
-            //    completedOperations,
-            //    executionParams,
-            //    subscriptionResource,
-            //    blockedOperationsException,
-            //    location,
-            //    resourceGroupName,
-            //    subscriptionId);
+            /*
+             * Before creating a virtual machine, a virtual network and subnet must be created in the resource group
+             * This is what will be used by the virtual machine
+             */
+            var vnet = await UtilityMethods.CreateVirtualNetwork(resourceGroupResource, "default-subnet", "default-vnet", location, client);
+            var subnet = UtilityMethods.GetSubnetId(vnet);
 
-            // Delete type operation: Delete operation on virtual machines
-            var resourceIdsToDelete = new List<ResourceIdentifier>()
-            {
-                new($"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/vmTestOne"),
-            };
-            await ScheduledActions_ExecuteDeleteOperation(
-                resourceIdsToDelete,
+            // Create type operation: Create operation on virtual machines
+            await ExecuteCreateOperation(
+                completedOperations,
                 executionParams,
                 subscriptionResource,
                 blockedOperationsException,
                 location,
                 resourceGroupName,
                 subscriptionId,
-                Guid.NewGuid().ToString());
+                vnet.Id.Name,
+                subnet.Name);
+
+            // Delete type operation: Delete operation on virtual machines
+            //var resourceIdsToDelete = new List<ResourceIdentifier>()
+            //{
+            //    new($"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/vmTestOne"),
+            //};
+            //await ExecuteDeleteOperation(
+            //    resourceIdsToDelete,
+            //    executionParams,
+            //    subscriptionResource,
+            //    blockedOperationsException,
+            //    location,
+            //    resourceGroupName,
+            //    subscriptionId,
+            //    Guid.NewGuid().ToString());
+
+
+            Console.WriteLine($"Created Vnet: {vnet.Id.Name}");
+            Console.WriteLine($"Created Subnet: {subnet.Name}");
+
         }
 
         /// <summary>
@@ -94,7 +109,7 @@ namespace ComputeScheduleSampleProject
         /// <param name="rgName">Resource group name of the virtual machines</param>
         /// <param name="subscriptionId">Subscription Id of the virtual machines</param>
         /// <param name="correlationId">Correlation Id for the request</param>
-        private static async Task ScheduledActions_ExecuteDeleteOperation(
+        private static async Task ExecuteDeleteOperation(
             List<ResourceIdentifier> resourceIds,
             ScheduledActionExecutionParameterDetail executionParameterDetail,
             SubscriptionResource subscriptionResource,
@@ -176,7 +191,7 @@ namespace ComputeScheduleSampleProject
         /// <param name="location">Location of the virtual machines operation</param>
         /// <param name="rgName">Resource group name of the virtual machines</param>
         /// <param name="subscriptionId">Subscription Id of the virtual machines</param>
-        private static async Task ScheduledActions_ExecuteCreateOperation(
+        private static async Task ExecuteCreateOperation(
             Dictionary<string, ResourceOperationDetails> completedOperations,
             ScheduledActionExecutionParameterDetail executionParameterDetail,
             SubscriptionResource subscriptionResource,
@@ -184,33 +199,34 @@ namespace ComputeScheduleSampleProject
             string location,
             string rgName,
             string subscriptionId,
-            bool shouldDelete = false)
+            string vnetName,
+            string subnetName)
         {
-                // CorrelationId: This is a unique identifier used internally to track and monitor operations in ScheduledActions
-                var correlationId = Guid.NewGuid().ToString();
+            // CorrelationId: This is a unique identifier used internally to track and monitor operations in ScheduledActions
+            var correlationId = Guid.NewGuid().ToString();
 
-                // resource overrides generation for the create operation
-                var resourceOverrideOne = UtilityMethods.GenerateResourceOverrideItem(
-                    "vmTestOne",
-                    location,
-                    "Standard_D2ads_v5",
-                    "YourStr0ngP@ssword123!",
-                    "testUserName");
+            // resource overrides generation for the create operation
+            var resourceOverrideOne = UtilityMethods.GenerateResourceOverrideItem(
+                "override-vm-name",
+                location,
+                "Standard_D2ads_v5",
+                "YourStr0ngP@ssword123!",
+                "testUserName");
 
-                // The request body for the executecreate operation on virtual machines
-                var executecreatecontent = UtilityMethods.BuildExecuteCreateRequest(
-                    "testCreate_Sdk",
-                    correlationId,
-                    1,
-                    executionParameterDetail,
-                    rgName,
-                    "testvnet",
-                    "testsubnet",
-                    location,
-                    [resourceOverrideOne],
-                    subscriptionId,
-                    true
-                    );
+            // The request body for the executecreate operation on virtual machines
+            var executecreatecontent = UtilityMethods.BuildExecuteCreateRequest(
+                "test-vm-prefix",
+                correlationId,
+                1,
+                executionParameterDetail,
+                rgName,
+                vnetName,
+                subnetName,
+                location,
+                [resourceOverrideOne],
+                subscriptionId,
+                true
+                );
 
             var createOps = ModelReaderWriter.Write(executecreatecontent, ModelReaderWriterOptions.Json);
             Console.WriteLine(createOps.ToString());
@@ -232,19 +248,6 @@ namespace ComputeScheduleSampleProject
                 if (validOps.Count > 0)
                 {
                     await UtilityMethods.PollOperationStatus([.. validOps.Keys], completedOperations, location, subscriptionResource);
-
-                    if (shouldDelete)
-                    {
-                        await ScheduledActions_ExecuteDeleteOperation(
-                            validOps.Values.ToList()!,
-                            executionParameterDetail,
-                            subscriptionResource,
-                            blockedOperationsException,
-                            location,
-                            rgName,
-                            subscriptionId,
-                            correlationId);
-                    }
                 }
                 else
                 {
@@ -292,7 +295,7 @@ namespace ComputeScheduleSampleProject
         /// <param name="location">Location of the virtual machines operation</param>
         /// <param name="resourceIds">ResourceIds to perform the Computeschedule execute operation on</param>
         /// <returns></returns>
-        private static async Task ScheduledActions_ExecuteStartOperation(
+        private static async Task ExecuteStartOperation(
             Dictionary<string, ResourceOperationDetails> completedOperations,
             ScheduledActionExecutionParameterDetail executionParameterDetail,
             SubscriptionResource subscriptionResource,

@@ -1,4 +1,5 @@
-﻿using Azure.Core;
+﻿using Azure;
+using Azure.Core;
 using Azure.ResourceManager;
 using Azure.ResourceManager.ComputeSchedule;
 using Azure.ResourceManager.ComputeSchedule.Models;
@@ -122,6 +123,59 @@ namespace ComputeScheduleSampleProject
 
         // Timeout for polling operation status
         private static readonly int OperationTimeoutInMinutes = 125;
+
+        /// <summary>
+        ///   Utility method to get the first subnet id from a virtual network  
+        /// </summary>
+        /// <param name="vnet">The vnet resource created.</param>
+        /// <returns></returns>
+        public static ResourceIdentifier GetSubnetId(GenericResource vnet)
+        {
+            var properties = vnet.Data.Properties.ToObjectFromJson() as Dictionary<string, object>;
+            var subnets = properties["subnets"] as IEnumerable<object>;
+            var subnet = subnets.First() as IDictionary<string, object>;
+            return new ResourceIdentifier(subnet["id"] as string);
+        }
+
+        /// <summary>
+        /// Create a virtual network with a subnet for virtual machine creation.
+        /// </summary>
+        /// <param name="resourceGroupResource">Resource group name</param>
+        /// <param name="vnetName">Proposed vnet name</param>
+        /// <param name="subnetName">Proposed subnet name</param>
+        /// <param name="location">Proposed location for vnet and subnet creation</param>
+        /// <param name="client">ARM Client</param>
+        /// <returns></returns>
+
+        public static async Task<GenericResource> CreateVirtualNetwork(ResourceGroupResource resourceGroupResource, string subnetName, string vnetName, AzureLocation location, ArmClient client)
+        {
+            ResourceIdentifier vnetId = new($"{resourceGroupResource.Id}/providers/Microsoft.Network/virtualNetworks/{vnetName}");
+            var addressSpaces = new Dictionary<string, object>()
+            {
+                { "addressPrefixes", new List<string>() { "10.0.0.0/16" } }
+            };
+            var subnet = new Dictionary<string, object>()
+            {
+                { "name", subnetName },
+                { "properties", new Dictionary<string, object>()
+                {
+                    { "addressPrefix", "10.0.2.0/24" },
+                    { "defaultoutboundaccess", false }
+                }
+                }
+            };
+            var subnets = new List<object>() { subnet };
+            var input = new GenericResourceData(location)
+            {
+                Properties = BinaryData.FromObjectAsJson(new Dictionary<string, object>()
+                {
+                    { "addressSpace", addressSpaces },
+                    { "subnets", subnets }
+                })
+            };
+            ArmOperation<GenericResource> operation = await client.GetGenericResources().CreateOrUpdateAsync(WaitUntil.Completed, vnetId, input);
+            return operation.Value;
+        }
 
         /// <summary>
         /// Generates a resource identifier for the subscriptionId
@@ -277,6 +331,10 @@ namespace ComputeScheduleSampleProject
             }
         }
 
+        /// <summary>
+        /// Utility method to print items in a dictionary
+        /// </summary>
+        /// <param name="dict"></param>
         public static void PrintDictionaryContents(IDictionary<string, BinaryData> dict)
         {
             foreach (var kvp in dict)
@@ -287,7 +345,8 @@ namespace ComputeScheduleSampleProject
 
 
         /// <summary>
-        /// Generates a resource override item for virtual machines
+        /// Generates a resource override item for virtual machines.
+        /// Computeschedule allows customers override certain properties of the base profile for each resource created.
         /// </summary>
         /// <param name="name">Name of the virtual machine</param>
         /// <param name="locationProperty">Location of the virtual machine</param>
@@ -428,13 +487,8 @@ namespace ComputeScheduleSampleProject
                 }
             };
 
-            if (enableResourceOverride)
+            if (enableResourceOverride && resourceOverrideDetail.Count > 0)
             {
-                if (resourceOverrideDetail.Count < resourceCount)
-                {
-                    throw new Exception("Resource override count must == " + resourceCount);
-                }
-
                 foreach (var overrideDict in resourceOverrideDetail)
                 {
                     payload.ResourceOverrides.Add(overrideDict);
