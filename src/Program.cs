@@ -91,11 +91,6 @@ namespace ComputeScheduleSampleProject
             //    resourceGroupName,
             //    subscriptionId,
             //    Guid.NewGuid().ToString());
-
-
-            Console.WriteLine($"Created Vnet: {vnet.Id.Name}");
-            Console.WriteLine($"Created Subnet: {subnet.Name}");
-
         }
 
         /// <summary>
