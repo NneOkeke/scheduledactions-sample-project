@@ -20,11 +20,17 @@ namespace UtilityMethods
         /// <param name="location">Location of the virtual machines operation</param>
         /// <param name="rgName">Resource group name of the virtual machines</param>
         /// <param name="subscriptionId">Subscription Id of the virtual machines</param>
+        /// <param name="vmCount">Number of virtual machines to create</param>
+        /// <param name="includeOverrides">Whether to include resource overrides in the request</param>
+        /// <param name="resourceOverrideDetails">The resource override details to apply while creating the virtual machines</param>
         public static async Task<Dictionary<string, ResourceIdentifier>> ExecuteCreateOperation(
             Dictionary<string, ResourceOperationDetails> completedOperations,
             ScheduledActionExecutionParameterDetail executionParameterDetail,
             SubscriptionResource subscriptionResource,
             HashSet<string> blockedOperationsException,
+            List<Dictionary<string, BinaryData>> resourceOverrideDetails,
+            int vmCount,
+            bool includeOverrides,
             string location,
             string rgName,
             string subscriptionId,
@@ -34,27 +40,19 @@ namespace UtilityMethods
             // CorrelationId: This is a unique identifier used internally to track and monitor operations in ScheduledActions
             var correlationId = Guid.NewGuid().ToString();
 
-            // resource overrides generation for the create operation
-            var resourceOverrideOne = HelperMethods.GenerateResourceOverrideItem(
-                "override-vm-name",
-                location,
-                "Standard_D2ads_v5",
-                "YourStr0ngP@ssword123!",
-                "testUserName");
-
             // The request body for the executecreate operation on virtual machines
             var executecreatecontent = HelperMethods.BuildExecuteCreateRequest(
                 "test-vm-prefix",
                 correlationId,
-                1,
+                vmCount,
                 executionParameterDetail,
                 rgName,
                 vnetName,
                 subnetName,
                 location,
-                [resourceOverrideOne],
+                resourceOverrideDetails,
                 subscriptionId,
-                true
+                includeOverrides
                 );
 
             var createOps = ModelReaderWriter.Write(executecreatecontent, ModelReaderWriterOptions.Json);

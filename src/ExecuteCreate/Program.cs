@@ -49,12 +49,23 @@ namespace ExecuteCreate
             var vnet = await HelperMethods.CreateVirtualNetwork(resourceGroupResource, "default-subnet", "default-vnet", location, client);
             var subnet = HelperMethods.GetSubnetId(vnet);
 
+            // resource overrides generation for the create operation
+            var resourceOverrideOne = HelperMethods.GenerateResourceOverrideItem(
+                "override-vm-name",
+                location,
+                "Standard_D2ads_v5",
+                "YourStr0ngP@ssword123!",
+                "testUserName");
+
             // Create type operation: Create operation on virtual machines
             await ComputescheduleOperations.ExecuteCreateOperation(
                 completedOperations,
                 executionParams,
                 subscriptionResource,
-                blockedOperationsException,
+                blockedOperationsException, 
+                [resourceOverrideOne],
+                1,
+                true,
                 location,
                 resourceGroupName,
                 subscriptionId,
