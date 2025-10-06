@@ -21,6 +21,7 @@ namespace UtilityMethods
                 ""baseProfile"": {
                   ""resourcegroupName"": ""computeschedule-azcliext-resources"",
                   ""computeApiVersion"": ""2023-09-01"",
+                  ""location"": ""eastus2euap"",
                   ""properties"": {
                     ""vmExtensions"": [
                       {
@@ -195,7 +196,7 @@ namespace UtilityMethods
         /// </summary>
         /// <param name="state"></param>
         /// <returns></returns>
-        public static bool IsOperationStateComplete(ScheduledActionOperationState? state)
+        public static bool IsOperationTerminal(ScheduledActionOperationState? state)
         {
             return state != null &&
                 (state == ScheduledActionOperationState.Succeeded |
@@ -221,7 +222,7 @@ namespace UtilityMethods
                 var operationError = operation.ResourceOperationError;
 
                 Console.WriteLine($"Trying polling for operation with id {operationId}.");
-                if (IsOperationStateComplete(operationState))
+                if (IsOperationTerminal(operationState))
                 {
                     completedOps.TryAdd(operationId, operation);
                     Console.WriteLine($"Operation {operationId} completed with state {operationState}");
@@ -424,6 +425,7 @@ namespace UtilityMethods
                 {
                     { "resourcegroupName", BinaryData.FromObjectAsJson(rgName) },
                     { "computeApiVersion", BinaryData.FromObjectAsJson("2023-09-01") },
+                    { "location", BinaryData.FromObjectAsJson(azureLocation) },
                     { "properties", BinaryData.FromObjectAsJson(new {
                         vmExtensions = new[]{
                             new {
@@ -436,6 +438,19 @@ namespace UtilityMethods
                                     autoUpgradeMinorVersion = true,
                                     enableAutomaticUpgrade = true,
                                     suppressFailures = true
+                                }
+                            }
+                        },
+                        osProfile = new {
+                            computerName = $"{resourcePrefix}defaultvm",
+                            adminUsername = "adminUser",
+                            adminPassword = "adminUserPassword@@",
+                            windowsConfiguration = new {
+                                provisionVmAgent = true,
+                                enableAutomaticUpdates = true,
+                                patchSettings = new {
+                                    patchMode = "AutomaticByPlatform",
+                                    assessmentMode = "ImageDefault"
                                 }
                             }
                         },

@@ -23,10 +23,10 @@ namespace AllScenarios
             const string location = "eastus2euap";
 
             // SubscriptionId: The subscription id under which the virtual machines are located, in this case, we are using a dummy subscriptionId
-            const string subscriptionId = "a4f8220e-84cb-47a6-b2c0-c1900805f616";
+            const string subscriptionId = "1d04e8f1-ee04-4056-b0b2-718f5bb45b04";
 
             // ResourceGroupName: The resource group name under which the virtual machines are located, in this case, we are using a dummy resource group name
-            const string resourceGroupName = "demo-rg";
+            const string resourceGroupName = "computeschedule-azcliext-resources";
 
             Dictionary<string, ResourceOperationDetails> completedOperations = [];
             // Credential: The Azure credential used to authenticate the request
@@ -209,17 +209,24 @@ namespace AllScenarios
                 "YourStr0ngP@ssword123!",
                 "testUserName");
 
+            var resourceOverrideTwo = HelperMethods.GenerateResourceOverrideItem
+                ("override-vm-name-two",
+                location,
+                "Standard_D2ads_v5",
+                "YourStr0ngP@ssword123!",
+                "testUserName");
+
             // The request body for the executecreate operation on virtual machines
             var executecreatecontent = HelperMethods.BuildExecuteCreateRequest(
                 "test-vm-prefix",
                 correlationId,
-                1,
+                3,
                 executionParameterDetail,
                 rgName,
                 vnetName,
                 subnetName,
                 location,
-                [resourceOverrideOne],
+                [resourceOverrideOne, resourceOverrideTwo],
                 subscriptionId,
                 true
                 );

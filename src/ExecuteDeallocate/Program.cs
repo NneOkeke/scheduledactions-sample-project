@@ -4,7 +4,7 @@ using Azure.ResourceManager;
 using Azure.ResourceManager.ComputeSchedule.Models;
 using UtilityMethods;
 
-namespace ExecuteDelete
+namespace ExecuteStart
 {
     public static class Program
     {
@@ -28,6 +28,7 @@ namespace ExecuteDelete
             // Client: The Azure Resource Manager client used to interact with the Azure Resource Manager API
             ArmClient client = new(cred);
             var subscriptionResource = HelperMethods.GetSubscriptionResource(client, subscriptionId);
+            var resourceGroupResource = await subscriptionResource.GetResourceGroupAsync(resourceGroupName);
 
             // Execution parameters for the request including the retry policy used by Scheduledactions to retry the operation in case of failures
             var executionParams = new ScheduledActionExecutionParameterDetail()
@@ -41,20 +42,20 @@ namespace ExecuteDelete
                 }
             };
 
+            // List of virtual machine resource identifiers to perform execute/submit type operations on, in this case, we are using dummy VMs. Virtual Machines must all be under the same subscriptionid
             var resourceIds = new List<ResourceIdentifier>()
             {
                 new($"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/vmnameOne"),
                 new($"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/vmnameTwo"),
             };
 
-            // Create type operation: Create operation on virtual machines
-            await ComputescheduleOperations.ExecuteDeleteOperation(
-                resourceIds,
+            await ComputescheduleOperations.ExecuteDeallocateOperation(
+                completedOperations,
                 executionParams,
                 subscriptionResource,
                 blockedOperationsException,
-                location,
-                isForceDeletion: true);
+                resourceIds,
+                location);
         }
     }
 }

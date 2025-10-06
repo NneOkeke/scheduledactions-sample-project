@@ -16,10 +16,10 @@ namespace ExecuteCreate
             const string location = "eastus2euap";
 
             // SubscriptionId: The subscription id under which the virtual machines are located, in this case, we are using a dummy subscriptionId
-            const string subscriptionId = "a4f8220e-84cb-47a6-b2c0-c1900805f616";
+            const string subscriptionId = "1d04e8f1-ee04-4056-b0b2-718f5bb45b04";
 
             // ResourceGroupName: The resource group name under which the virtual machines are located, in this case, we are using a dummy resource group name
-            const string resourceGroupName = "demo-rg";
+            const string resourceGroupName = "computeschedule-azcliext-resources";
 
             Dictionary<string, ResourceOperationDetails> completedOperations = [];
             // Credential: The Azure credential used to authenticate the request
@@ -46,12 +46,22 @@ namespace ExecuteCreate
              * Before creating a virtual machine, a virtual network and subnet must be created in the resource group
              * This is what will be used by the virtual machine
              */
-            var vnet = await HelperMethods.CreateVirtualNetwork(resourceGroupResource, "default-subnet", "default-vnet", location, client);
+            var options = new ArmClientOptions();
+            options.SetApiVersion(new ResourceType("Microsoft.Network/virtualNetworks"), "2025-03-01");
+            var vnetClient = new ArmClient(cred, subscriptionId, options);
+            var vnet = await HelperMethods.CreateVirtualNetwork(resourceGroupResource, "default-subnet", "default-vnet", location, vnetClient);
             var subnet = HelperMethods.GetSubnetId(vnet);
 
             // resource overrides generation for the create operation
             var resourceOverrideOne = HelperMethods.GenerateResourceOverrideItem(
-                "override-vm-name",
+                "vmnameOne",
+                location,
+                "Standard_D2ads_v5",
+                "YourStr0ngP@ssword123!",
+                "testUserName");
+
+            var resourceOverrideTwo = HelperMethods.GenerateResourceOverrideItem(
+                "vmnameTwo",
                 location,
                 "Standard_D2ads_v5",
                 "YourStr0ngP@ssword123!",
@@ -63,8 +73,8 @@ namespace ExecuteCreate
                 executionParams,
                 subscriptionResource,
                 blockedOperationsException, 
-                [resourceOverrideOne],
-                1,
+                [resourceOverrideOne, resourceOverrideTwo],
+                3,
                 true,
                 location,
                 resourceGroupName,
