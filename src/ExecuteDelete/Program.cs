@@ -43,8 +43,8 @@ namespace ExecuteDelete
 
             var resourceIds = new List<ResourceIdentifier>()
             {
-                new($"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/vmnameOne"),
-                new($"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/vmnameTwo"),
+                new($"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/tv0"),
+                new($"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/tv1"),
             };
 
             // Create type operation: Create operation on virtual machines

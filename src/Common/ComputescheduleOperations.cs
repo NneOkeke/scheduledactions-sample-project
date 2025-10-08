@@ -42,7 +42,7 @@ namespace UtilityMethods
 
             // The request body for the executecreate operation on virtual machines
             var executecreatecontent = HelperMethods.BuildExecuteCreateRequest(
-                "TVP",
+                "vmtest",
                 correlationId,
                 vmCount,
                 executionParameterDetail,

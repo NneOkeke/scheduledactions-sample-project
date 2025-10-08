@@ -197,6 +197,32 @@ namespace UtilityMethods
         }
 
         /// <summary>
+        /// Create a data disk for virtual machine creation.
+        /// </summary>
+        /// <param name="resourceGroupResource">Resource group name</param>
+        /// <param name="dataDiskName">Proposed disk name</param>
+        /// <param name="subscriptionId">SubscriptionId</param>
+        /// <param name="location">Proposed location for vnet and subnet creation</param>
+        /// <param name="client">ARM Client</param>
+        /// <returns></returns>
+        public static async Task<GenericResource> CreateDataDisk(ResourceGroupResource resourceGroupResource, string subscriptionId, string dataDiskName, AzureLocation location, ArmClient client)
+        {
+            ResourceIdentifier diskId = new($"/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupResource.Id}/providers/Microsoft.Compute/disks/{dataDiskName}");
+
+            var input = new GenericResourceData(location)
+            {
+                Properties = BinaryData.FromObjectAsJson(new Dictionary<string, object>()
+                {
+                    { "sku", new { name = "Standard_LRS" } },
+                    { "diskSizeGB", 128 },
+                    { "creationData", new { createOption = "Empty" } }
+                })
+            };
+            ArmOperation<GenericResource> operation = await client.GetGenericResources().CreateOrUpdateAsync(WaitUntil.Completed, diskId, input);
+            return operation.Value;
+        }
+
+        /// <summary>
         /// Generates a resource identifier for the subscriptionId
         /// </summary>
         /// <param name="client"></param>
@@ -323,6 +349,7 @@ namespace UtilityMethods
 
         public static async Task<Dictionary<string, ResourceIdentifier>> PollOperationStatus(HashSet<string> opIdsFromOperationReq, Dictionary<string, ResourceOperationDetails> completedOps, string location, SubscriptionResource resource)
         {
+            // This value controls the initial wait time before the first polling call is made
             await Task.Delay(s_initialWaitTimeBeforePollingInSeconds);
 
             GetOperationStatusContent getOpsStatusRequest = new(opIdsFromOperationReq, Guid.NewGuid().ToString());
@@ -338,7 +365,8 @@ namespace UtilityMethods
                 if (!ShouldRetryPolling(response, opIdsFromOperationReq.Count, completedOps))
                 {
                     opIdsToResourceIds = response.Results.ToDictionary(x => x.Operation.OperationId, x => x.ResourceId);
-                    Console.WriteLine(ModelReaderWriter.Write(response, ModelReaderWriterOptions.Json).ToString());
+                    GetOperationStatusResult? allOpsStatus = await resource.GetVirtualMachineOperationStatusAsync(location, new(opIdsFromOperationReq, Guid.NewGuid().ToString()));
+                    Console.WriteLine(ModelReaderWriter.Write(allOpsStatus, ModelReaderWriterOptions.Json).ToString());
                     break;
                 }
                 else
@@ -348,6 +376,7 @@ namespace UtilityMethods
                     response = await resource.GetVirtualMachineOperationStatusAsync(location, pendingOpIds);
                 }
 
+                // This value controls the interval between each poll call
                 await Task.Delay(TimeSpan.FromSeconds(s_pollingIntervalInSeconds), cts.Token);
             }
 
@@ -376,12 +405,14 @@ namespace UtilityMethods
         /// <param name="vmsize">Size of the virtual machine</param>
         /// <param name="password">Admin password for the virtual machine</param>
         /// <param name="adminUsername">Admin username for the virtual machine</param>
+        /// <param name="diskId">Disk being set in the resource override</param>
         public static Dictionary<string, BinaryData> GenerateResourceOverrideItem(
             string name,
             string locationProperty,
             string vmsize,
             string password,
-            string adminUsername)
+            string adminUsername,
+            string diskId)
         {
             var resourceOverrideDetail = new Dictionary<string, BinaryData>
             {
@@ -401,6 +432,18 @@ namespace UtilityMethods
                             patchSettings = new {
                                 patchMode = "AutomaticByPlatform",
                                 assessmentMode = "ImageDefault"
+                            }
+                        }
+                    },
+                    storageProfile = new {
+                        dataDisks = new[]{
+                            new {
+                                lun = 0,
+                                createOption = "Attach",
+                                deleteOption = "Detach",
+                                managedDisk = new {
+                                    id = diskId
+                                }
                             }
                         }
                     }
@@ -473,7 +516,7 @@ namespace UtilityMethods
                             }
                         },
                         hardwareProfile = new {
-                            vmSize = "Standard_D2s_v3"
+                            vmSize = "Standard_D2ads_v5"
                         },
                         storageProfile = new {
                             imageReference = new {
@@ -491,7 +534,8 @@ namespace UtilityMethods
                                 },
                                 deleteOption = "Detach",
                                 diskSizeGB = 127,
-                            }
+                            },
+                            diskControllerType = "SCSI"
                         },
                         networkProfile = new {
                             networkApiVersion = "2022-07-01",

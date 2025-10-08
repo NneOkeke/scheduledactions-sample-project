@@ -49,7 +49,7 @@ namespace ExecuteCreate
             var options = new ArmClientOptions();
             options.SetApiVersion(new ResourceType("Microsoft.Network/virtualNetworks"), "2025-03-01");
             var vnetClient = new ArmClient(cred, subscriptionId, options);
-            var vnet = await HelperMethods.CreateVirtualNetwork(resourceGroupResource, "default-subnet", "default-vnet", location, vnetClient);
+            var vnet = await HelperMethods.CreateVirtualNetwork(resourceGroupResource, "tester-subnet", "tester-vnet", location, vnetClient);
             var subnet = HelperMethods.GetSubnetId(vnet);
 
             // resource overrides generation for the create operation
@@ -58,14 +58,16 @@ namespace ExecuteCreate
                 location,
                 "Standard_D2ads_v5",
                 "YourStr0ngP@ssword123!",
-                "testUserName");
+                "testUserName",
+                $"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/disks/dotnet-sdk");
 
             var resourceOverrideTwo = HelperMethods.GenerateResourceOverrideItem(
                 "vmnameTwo",
                 location,
                 "Standard_D2ads_v5",
                 "YourStr0ngP@ssword123!",
-                "testUserName");
+                "testUserName",
+                $"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/disks/dotnet-sdk-two");
 
             // Create type operation: Create operation on virtual machines
             await ComputescheduleOperations.ExecuteCreateOperation(
@@ -74,7 +76,7 @@ namespace ExecuteCreate
                 subscriptionResource,
                 blockedOperationsException, 
                 [resourceOverrideOne, resourceOverrideTwo],
-                3,
+                2,
                 true,
                 location,
                 resourceGroupName,
