@@ -5,6 +5,7 @@ using Azure.ResourceManager.ComputeSchedule;
 using Azure.ResourceManager.ComputeSchedule.Models;
 using Azure.ResourceManager.Resources;
 using System.ClientModel.Primitives;
+using System.Dynamic;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -412,46 +413,58 @@ namespace UtilityMethods
             string vmsize,
             string password,
             string adminUsername,
-            string diskId)
+            string diskId = "")
         {
-            var resourceOverrideDetail = new Dictionary<string, BinaryData>
+            dynamic properties = new ExpandoObject();
+
+            properties.hardwareProfile = new
             {
-                { "name", BinaryData.FromObjectAsJson(name) },
-                { "location", BinaryData.FromObjectAsJson(locationProperty) },
-                { "properties", BinaryData.FromObjectAsJson(new {
-                    hardwareProfile = new {
-                        vmSize = vmsize
-                    },
-                    osProfile = new {
-                        computerName = name,
-                        adminUsername = adminUsername,
-                        adminPassword = password,
-                        windowsConfiguration = new {
-                            provisionVmAgent = true,
-                            enableAutomaticUpdates = true,
-                            patchSettings = new {
-                                patchMode = "AutomaticByPlatform",
-                                assessmentMode = "ImageDefault"
-                            }
-                        }
-                    },
-                    storageProfile = new {
-                        dataDisks = new[]{
-                            new {
-                                lun = 0,
-                                createOption = "Attach",
-                                deleteOption = "Detach",
-                                managedDisk = new {
-                                    id = diskId
-                                }
-                            }
-                        }
+                vmSize = vmsize
+            };
+
+            properties.osProfile = new
+            {
+                computerName = name,
+                adminUsername = adminUsername,
+                adminPassword = password,
+                windowsConfiguration = new
+                {
+                    provisionVmAgent = true,
+                    enableAutomaticUpdates = true,
+                    patchSettings = new
+                    {
+                        patchMode = "AutomaticByPlatform",
+                        assessmentMode = "ImageDefault"
                     }
-                })
                 }
             };
 
-            return resourceOverrideDetail;
+            if (!string.IsNullOrWhiteSpace(diskId))
+            {
+                properties.storageProfile = new
+                {
+                    dataDisks = new[]
+                        {
+                            new
+                            {
+                                lun = 0,
+                                createOption = "Attach",
+                                deleteOption = "Detach",
+                                managedDisk = new
+                                {
+                                    id = diskId,
+                                }
+                            }
+                        }
+                    };
+            }
+
+            return new Dictionary<string, BinaryData>
+            {
+                    { "name", BinaryData.FromObjectAsJson(name) },
+                    { "location", BinaryData.FromObjectAsJson(locationProperty) },
+                    { "properties", BinaryData.FromObjectAsJson(properties) }
+            };
         }
 
         /// <summary>

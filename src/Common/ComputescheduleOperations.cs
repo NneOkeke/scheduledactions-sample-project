@@ -347,5 +347,81 @@ namespace UtilityMethods
                 throw;
             }
         }
+
+        /// <summary>
+        /// This method details the happy path for executing an execute type operation in ScheduledActions
+        /// </summary>
+        /// <param name="completedOperations">Hashset of completed operations to track</param>
+        /// <param name="executionParameterDetail">Execution parameters for the request</param>
+        /// <param name="subscriptionResource">Subscription resource with Computeschedule operations</param>
+        /// <param name="blockedOperationsException">Exceptions representing blocked operations</param>
+        /// <param name="location">Location of the virtual machines operation</param>
+        /// <param name="resourceIds">ResourceIds to perform the Computeschedule execute operation on</param>
+        /// <returns></returns>
+        public static async Task ExecuteHibernateOperation(
+            Dictionary<string, ResourceOperationDetails> completedOperations,
+            ScheduledActionExecutionParameterDetail executionParameterDetail,
+            SubscriptionResource subscriptionResource,
+            HashSet<string> blockedOperationsException,
+            List<ResourceIdentifier> resourceIds,
+            string location)
+        {
+            try
+            {
+                // CorrelationId: This is a unique identifier used internally to track and monitor operations in ScheduledActions
+                var correlationId = Guid.NewGuid().ToString();
+
+                // The request body for the executehibernate operation on virtual machines
+                var executeHibernateRequest = new ExecuteHibernateContent(executionParameterDetail, new UserRequestResources(resourceIds), correlationId);
+
+                HibernateResourceOperationResult? result = await subscriptionResource.ExecuteVirtualMachineHibernateAsync(location, executeHibernateRequest);
+
+                /// <summary>
+                /// Each operationId corresponds to a virtual machine operation in ScheduledActions. 
+                /// The method below excludes resources that have not been processed in ScheduledActions due to a number of reasons 
+                /// like operation conflicts, virtual machines not being found in an Azure location etc 
+                /// and returns only the valid operations that have passed validation checks to be polled.
+                /// </summary>
+                var validOperationIds = HelperMethods.ExcludeResourcesNotProcessed(result.Results).Keys.ToHashSet();
+                completedOperations.Clear();
+
+                if (validOperationIds.Count > 0)
+                {
+                    await HelperMethods.PollOperationStatus(validOperationIds, completedOperations, location, subscriptionResource);
+                }
+                else
+                {
+                    Console.WriteLine("No valid operations to poll");
+                    return;
+                }
+            }
+            catch (RequestFailedException ex)
+            {
+                /// <summary>
+                /// Request examples that could make a request fall into this catch block include:
+                /// VALIDATION ERRORS:
+                /// - No resourceids provided in request
+                /// - Over 100 resourceids provided in request
+                /// - RetryPolicy.RetryCount value > 7
+                /// - RetryPolicy.RetryWindowInMinutes value > 120
+                /// COMPUTESCHEDULE BLOCKING ERRORS:
+                /// - Scheduling Operations Blocked due to an ongoing outage in downstream services
+                /// - Non-Scheduling Operations Blocked, eg VirtualMachinesGetOperationStatus operations, due to an ongoing outage in downstream services
+                /// </summary>
+                Console.WriteLine($"Request failed with ErrorCode:{ex.ErrorCode} and ErrorMessage: {ex.Message}");
+
+                if (ex.ErrorCode != null && blockedOperationsException.Contains(ex.ErrorCode))
+                {
+                    /// Operation blocking on scheduling/non-scheduling actions can be due to scenarios like outages in downstream services.
+                    Console.WriteLine($"Operation Blocking is turned on, request may succeed later.");
+                }
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Request failed with Exception:{ex.Message}");
+                throw;
+            }
+        }
     }
 }
