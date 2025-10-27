@@ -1,0 +1,279 @@
+type: collection.insomnia.rest/5.0
+name: Create/Delete
+meta:
+  id: wrk_1a6c71411bd0468794d2cb8a2100a3f1
+  created: 1747159030546
+  modified: 1747159030546
+  description: ""
+collection:
+  - name: databricks
+    meta:
+      id: fld_a66df466efe24a7cbafa236f5bdb0903
+      created: 1761572940153
+      modified: 1761584043687
+      sortKey: -1761572940153
+      description: ""
+    children:
+      - url: https://eastus2euap.management.azure.com/subscriptions/1d04e8f1-ee04-4056-b0b2-718f5bb45b04/providers/Microsoft.computeschedule/locations/eastus2euap/virtualMachinesExecuteDelete?api-version=2025-05-01
+        name: delete
+        meta:
+          id: req_b1599c06510b4717ad645ae268ff990c
+          created: 1748961339116
+          modified: 1761591382808
+          isPrivate: false
+          description: ""
+          sortKey: -1761572980553
+        method: POST
+        body:
+          mimeType: application/json
+          text: >-
+            {
+            	"executionParameters": {},
+            	"resources": {
+            		"ids": [
+            			"/subscriptions/1d04e8f1-ee04-4056-b0b2-718f5bb45b04/resourceGroups/KRONOXINTEGRATIONTESTSCEUP/providers/Microsoft.Compute/virtualMachines/dbdiskdemo1",
+            			"/subscriptions/1d04e8f1-ee04-4056-b0b2-718f5bb45b04/resourceGroups/KRONOXINTEGRATIONTESTSCEUP/providers/Microsoft.Compute/virtualMachines/dbdiskdemo2"
+            		]
+            	},
+            	"forceDeletion": true
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.1.0
+        authentication:
+          type: bearer
+          token: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: https://eastus2euap.management.azure.com/subscriptions/1d04e8f1-ee04-4056-b0b2-718f5bb45b04/providers/Microsoft.computeschedule/locations/eastus2euap/virtualMachinesGetOperationStatus?api-version=2025-05-01
+        name: GetOpStatus
+        meta:
+          id: req_1ebcd762d54b4dabb6389b25b4c085c1
+          created: 1749757987452
+          modified: 1761591369626
+          isPrivate: false
+          description: ""
+          sortKey: -1761572980603
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"OperationIds": [
+            		"438c3e5e-9ae3-473c-a862-f815e4b46f50",
+            		"b54ca5b0-91ee-40c9-b6a1-f6e184b7f858"
+            	],
+            	"correlationid": "b54ca5b0-91ee-40c9-b6a1-f6e184b7f858"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.2.0
+        authentication:
+          type: bearer
+          token: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: https://eastus2euap.management.azure.com/subscriptions/1d04e8f1-ee04-4056-b0b2-718f5bb45b04/providers/Microsoft.computeschedule/locations/eastus2euap/virtualMachinesExecuteCreate?api-version=2025-05-01
+        name: Create request_overrideNames
+        meta:
+          id: req_af23bd033fef411ea23d740797cd2314
+          created: 1757345890690
+          modified: 1761591452579
+          isPrivate: false
+          description: ""
+          sortKey: -1761572980578
+        method: POST
+        body:
+          mimeType: application/json
+          text: >-
+            {
+            	"resourceConfigParameters": {
+            		"resourceCount": 2,	
+            		"baseProfile": {
+            			"resourcegroupName": "TestRGName",
+            			"computeApiVersion": "2023-09-01",
+            			"location": "centraleuap",
+            			"properties": {
+            				"osProfile": {
+            					"computerName": "dbdiskdemo22",
+            					"adminUsername": "testUserName",
+            					"adminPassword": "",
+            					"windowsConfiguration": {
+            						"provisionVmAgent": true,
+            						"enableAutomaticUpdates": true,
+            						"patchSettings": {
+            							"patchMode": "AutomaticByPlatform",
+            							"assessmentMode": "ImageDefault"
+            						}
+            					}
+            				},
+            				"vmExtensions": [
+            					{
+            						"name": "Microsoft.Azure.Geneva.GenevaMonitoring",
+            						"location": "centraluseuap",
+            						"properties": {
+            							"autoUpgradeMinorVersion": true,
+            							"enableAutomaticUpgrade": true,
+            							"suppressFailures": true,
+            							"publisher": "Microsoft.Azure.Geneva",
+            							"type": "GenevaMonitoring",
+            							"typeHandlerVersion": "2.0"
+            						}
+            					}
+            				],
+            				"hardwareProfile": {
+            					"vmSize": "Standard_D2ads_v5"
+            				},
+            				"storageProfile": {
+            					"imageReference": {
+            						"publisher": "MicrosoftWindowsServer",
+            						"offer": "WindowsServer",
+            						"sku": "2022-datacenter-azure-edition",
+            						"version": "latest"
+            					},
+            					"osDisk": {
+            						"osType": "Windows",
+            						"createOption": "FromImage",
+            						"caching": "ReadWrite",
+            						"managedDisk": {
+            							"storageAccountType": "Standard_LRS"
+            						},
+            						"deleteOption": "Detach",
+            						"diskSizeGB": 127
+            					},
+            					"diskControllerType": "SCSI"
+            				},
+            				"networkProfile": {
+            					"networkInterfaceConfigurations": [
+            						{
+            							"name": "vmTest",
+            							"properties": {
+            								"primary": true,
+            								"enableIPForwarding": true,
+            								"ipConfigurations": [
+            									{
+            										"name": "vmTest",
+            										"properties": {
+            											"subnet": {
+            												"id": "/subscriptions/1d04e8f1-ee04-4056-b0b2-718f5bb45b04/resourceGroups/KRONOXINTEGRATIONTESTSCEUP/providers/Microsoft.Network/virtualNetworks/KRONOX-ARG-VM1-vnet/subnets/default"
+            											},
+            											"primary": true,
+            											"applicationGatewayBackendAddressPools": [],
+            											"loadBalancerBackendAddressPools": []
+            										}
+            									}
+            								]
+            							}
+            						}
+            					],
+            					"networkApiVersion": "2022-07-01"
+            				}
+            			}
+            		},
+            		"resourceOverrides": [
+            			{
+            				"name": "dbdiskdemo25",
+            				"location": "centraluseuap",
+            				"tags": {
+            					"nodeid": "customnode1AItag"
+            				},
+            				"properties": {
+            					"hardwareProfile": {
+            						"vmSize": "Standard_DS1_v2"
+            					},
+            					"osProfile": {
+            						"computerName": "dbdiskdemo25",
+            						"adminUsername": "testUserName",
+            						"adminPassword": "",
+            						"windowsConfiguration": {
+            							"provisionVmAgent": true,
+            							"enableAutomaticUpdates": true,
+            							"patchSettings": {
+            								"patchMode": "AutomaticByPlatform",
+            								"assessmentMode": "ImageDefault"
+            							}
+            						}
+            					}
+            				}
+            			},
+            			{
+            				"name": "dbdiskdemo26",
+            				"location": "centraluseuap",
+            				"tags": {
+            					"nodeid": "customnode2AItag"
+            				},
+            				"properties": {
+            					"hardwareProfile": {
+            						"vmSize": "Standard_DS1_v2"
+            					},
+            					"osProfile": {
+            						"computerName": "dbdiskdemo26",
+            						"adminUsername": "testUserName",
+            						"adminPassword": "",
+            						"windowsConfiguration": {
+            							"provisionVmAgent": true,
+            							"enableAutomaticUpdates": true,
+            							"patchSettings": {
+            								"patchMode": "AutomaticByPlatform",
+            								"assessmentMode": "ImageDefault"
+            							}
+            						}
+            					}
+            				}
+            			}
+            		]
+            	},
+            	"executionParameters": {
+            		"retryPolicy": {
+            			"retryCount": 0
+            		}
+            	},
+            	"correlationid": "7efcfae3-f50d-4323-9aba-1093a33368f8"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.2.0
+        authentication:
+          type: bearer
+          token: ""
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_e561ea5d77917691cfd9a18481d7b1f3f4bf4efb
+    created: 1747159030560
+    modified: 1747159030560
+environments:
+  name: Base Environment
+  meta:
+    id: env_e561ea5d77917691cfd9a18481d7b1f3f4bf4efb
+    created: 1747159030558
+    modified: 1761233829946
+    isPrivate: false
+  data:
+    bearerToken: eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6InlFVXdtWFdMMTA3Q2MtN1FaMldTYmVPYjNzUSIsImtpZCI6InlFVXdtWFdMMTA3Q2MtN1FaMldTYmVPYjNzUSJ9.eyJhdWQiOiJodHRwczovL21hbmFnZW1lbnQuY29yZS53aW5kb3dzLm5ldCIsImlzcyI6Imh0dHBzOi8vc3RzLndpbmRvd3MubmV0LzcyZjk4OGJmLTg2ZjEtNDFhZi05MWFiLTJkN2NkMDExZGI0Ny8iLCJpYXQiOjE3NjEyMzM0OTYsIm5iZiI6MTc2MTIzMzQ5NiwiZXhwIjoxNzYxMjM3NTA5LCJfY2xhaW1fbmFtZXMiOnsiZ3JvdXBzIjoic3JjMSJ9LCJfY2xhaW1fc291cmNlcyI6eyJzcmMxIjp7ImVuZHBvaW50IjoiaHR0cHM6Ly9ncmFwaC53aW5kb3dzLm5ldC83MmY5ODhiZi04NmYxLTQxYWYtOTFhYi0yZDdjZDAxMWRiNDcvdXNlcnMvNzQ4YTZkZjAtOGI4MC00ODY1LWFjYTktY2FhZTM4ZGQ3ZTRlL2dldE1lbWJlck9iamVjdHMifX0sImFjciI6IjEiLCJhY3JzIjpbInAxIiwiYzUiLCJjMTAiXSwiYWlvIjoiQVVRQnUvNGFBQUFBRTYyVjVBb1hQNE1HcHFmVytTTzRXSEFieWE5Umtab1VIVEo0OG9CcEFEWWtuNjFhUyt6bFFZMkRpelJ3R0IwZ1hLSFliS0NWS2hadlFQaThpRDk3cFpaQ3B0dDFYcGZrRk40OEY2ODYyL0cvdEcwVlRET3Q2Z1RNcFU2OFkxRCtvVEtYNlRsbWFaWTliQXVVcWV0dm1kUk84cUp3eFZhL3FKUjA2VElXamF3WkhpUytFcGdCbVBETEtvNFFSOXNxMUg3enZ1bjc2dnE4Zyt1cno2YVY5eEZXb2p0RnhHbHV1eWsxUC96YWZzY3U1ZW1ITlpnQnVxSk00NHFGL2V5M1dzRXgwS1VKNUdjdTFpb05hbGZjZVJxSlRXaVZ0ZDNybWk3RkF2RW9zaUFjaEp1SlBJNEhEVWcwelpsQTRhZ0k3cy9MWXFQWitiNXczT0ZucnFwbVVmSmVSSVA0dHZ6bE5xN3Urek1zM3Q5Z24zN0M5eVVRQ0JNczNnRVBRbGlIaHNZMEl0blgvbSsvWlNrdTlMOFk4NHhLeGcwcmN3cUZFamZZdUdEazd0WT0iLCJhbXIiOlsiZmlkbyIsInJzYSIsIm1mYSJdLCJhcHBpZCI6IjE4ZmJjYTE2LTIyMjQtNDVmNi04NWIwLWY3YmYyYjM5YjNmMyIsImFwcGlkYWNyIjoiMCIsImRldmljZWlkIjoiNDliMDRhNWMtYmExOS00ZmJiLWI1Y2YtZjU2MzU3MDBkMDZhIiwiZmFtaWx5X25hbWUiOiJHaW53YWxhIiwiZ2l2ZW5fbmFtZSI6IkhhcmRpayIsImlkdHlwIjoidXNlciIsImlwYWRkciI6IjEzLjcyLjI0MS4yMzkiLCJuYW1lIjoiSGFyZGlrIEdpbndhbGEiLCJvaWQiOiI3NDhhNmRmMC04YjgwLTQ4NjUtYWNhOS1jYWFlMzhkZDdlNGUiLCJvbnByZW1fc2lkIjoiUy0xLTUtMjEtMTI0NTI1MDk1LTcwODI1OTYzNy0xNTQzMTE5MDIxLTIwODgyNTMiLCJwdWlkIjoiMTAwMzIwMDFCMEQ0RjEwMyIsInJoIjoiMS5BUUVBdjRqNWN2R0dyMEdScXkxODBCSGJSMFpJZjNrQXV0ZFB1a1Bhd2ZqMk1CTWFBR2thQUEuIiwic2NwIjoidXNlcl9pbXBlcnNvbmF0aW9uIiwic2lkIjoiMDA5YTRjMTktMWJjYS02MzRkLTdiYTctZmEwMWM0NWMyN2QxIiwic3ViIjoiRnBLZXJma0NReEFBMUlweGdSY2tqWFpIQW9HREUwX3BpT0x0RV9LNDl6cyIsInRpZCI6IjcyZjk4OGJmLTg2ZjEtNDFhZi05MWFiLTJkN2NkMDExZGI0NyIsInVuaXF1ZV9uYW1lIjoiaGdpbndhbGFAbWljcm9zb2Z0LmNvbSIsInVwbiI6ImhnaW53YWxhQG1pY3Jvc29mdC5jb20iLCJ1dGkiOiIwRU5RYVhkekxrSzVOc3paUDRUQ0FBIiwidmVyIjoiMS4wIiwid2lkcyI6WyJiNzlmYmY0ZC0zZWY5LTQ2ODktODE0My03NmIxOTRlODU1MDkiXSwieG1zX2FjdF9mY3QiOiI1IDMiLCJ4bXNfZnRkIjoiNFdTa1lWeFdFQ19zM1RUc1lGR0ZtR0tLVmZITEl4SXRzYkVGVFlSRzMta0JkWE5sWVhOMExXUnpiWE0iLCJ4bXNfaWRyZWwiOiIxIDgiLCJ4bXNfc3ViX2ZjdCI6IjMgMiIsInhtc190Y2R0IjoxMjg5MjQxNTQ3fQ.A_FroTrdFqaOwxj994n5QvxacAPsbTBUS9d_d4oKrWO66LQH7meyaENNZ1ScN6l01vgKVNHblXfYXFxmGkiL75j2OWuc7W8vLay7iGr3dMHlQSLfIHBkyGxdluR7L3-7LrdTXSVyeHK7RDCZhQ49L4hJW-GQPyKNTJCHPaJCVB4REdo0mJgZHRMUy1vIHvpAgGJEYSsa80EaX5YMUeWAecbnBdO132wL9BTIsXN1rzjSxyyo1ZScRn17gfybNG1DV-wpM95VJXloCQlNIw7DZcaf5mPgnt_N-eWndDwR43vFXwGF5Ava9N0lLpz25y-ArzpawcY1yWb8ltw8fljbZQ
